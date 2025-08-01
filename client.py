@@ -12,15 +12,15 @@ class GitGuardianClient:
         ):
         self.base_url = base_url
         self.api_key = api_key
-        self.client = http_async_client
-        self.client.base_url = base_url.rstrip("/")
-        self.client.headers.update(self.api_auth_params["headers"])
+        self.http_client = http_async_client
+        self.http_client.base_url = base_url.rstrip("/")
+        self.http_client.headers.update(self.api_auth_params["headers"])
 
     @property
     def api_auth_params(self) -> dict[str, any]:
         return {
             "headers": {
-                "Authorization": f"Token {self.api}",
+                "Authorization": f"Token {self.api_key}",
                 "Content-Type": "application/json", 
             }
         }
