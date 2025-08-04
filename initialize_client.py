@@ -1,4 +1,4 @@
-from client import GitGuardianClient
+from gitguardian.client import GitGuardianClient
 from port_ocean.context.ocean import ocean
 
 async def init_gitguardian_client() -> GitGuardianClient:

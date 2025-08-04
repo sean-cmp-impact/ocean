@@ -7,7 +7,7 @@ from port_ocean.core.handlers.port_app_config.models import (
 from pydantic import Field
 
 
-class SourceSelector(Selector):
+class GitGuardianSourceSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -15,12 +15,12 @@ class SourceSelector(Selector):
     )
 
     
-class SourceConfig(ResourceConfig):
-    selector: SourceSelector
+class GitGuardianSourceConfig(ResourceConfig):
+    selector: GitGuardianSourceSelector
     kind: Literal["source"]
 
 
-class SecretDetectorSelector(Selector):
+class GitGuardianSecretDetectorSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -28,8 +28,8 @@ class SecretDetectorSelector(Selector):
     )
 
     
-class SecretDetectorConfig(ResourceConfig):
-    selector: SecretDetectorSelector
+class GitGuardianSecretDetectorConfig(ResourceConfig):
+    selector: GitGuardianSecretDetectorSelector
     kind: Literal["secret_detector"]
 
 
@@ -59,7 +59,7 @@ class PublicSecretIncidentConfig(ResourceConfig):
     kind: Literal["public_secret_incident"]
 
 
-class TeamSelector(Selector):
+class GitGuardianTeamSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -67,12 +67,12 @@ class TeamSelector(Selector):
     )
 
 
-class TeamConfig(ResourceConfig):
-    selector: TeamSelector
+class GitGuardianTeamConfig(ResourceConfig):
+    selector: GitGuardianTeamSelector
     kind: Literal["team"]
 
 
-class MemberSelector(Selector):
+class GitGuardianMemberSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -80,12 +80,12 @@ class MemberSelector(Selector):
     )
 
 
-class MemberConfig(ResourceConfig):
-    selector: MemberSelector
+class GitGuardianMemberConfig(ResourceConfig):
+    selector: GitGuardianMemberSelector
     kind: Literal["member"]
 
 
-class DeveloperSelector(Selector):
+class GitGuardianDeveloperSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -93,12 +93,12 @@ class DeveloperSelector(Selector):
     )
 
 
-class DeveloperConfig(ResourceConfig):
-    selector: DeveloperSelector
+class GitGuardianDeveloperConfig(ResourceConfig):
+    selector: GitGuardianDeveloperSelector
     kind: Literal["developer"]
 
 
-class AuditLogSelector(Selector):
+class GitGuardianAuditLogSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -106,12 +106,12 @@ class AuditLogSelector(Selector):
     )
 
 
-class AuditLogConfig(ResourceConfig):
-    selector: AuditLogSelector
+class GitGuardianAuditLogConfig(ResourceConfig):
+    selector: GitGuardianAuditLogSelector
     kind: Literal["audit_log"]
 
 
-class CustomTagSelector(Selector):
+class GitGuardianCustomTagSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -119,21 +119,21 @@ class CustomTagSelector(Selector):
     )
 
 
-class CustomTagConfig(ResourceConfig):
-    selector: CustomTagSelector
+class GitGuardianCustomTagConfig(ResourceConfig):
+    selector: GitGuardianCustomTagSelector
     kind: Literal["custom_tag"]
 
 
 class GitGuardianPortAppConfig(PortAppConfig):
     resources: list[
-        SourceConfig
-        | SecretDetectorSelector
+        GitGuardianSourceConfig
+        | GitGuardianSecretDetectorSelector
         | InternalSecretIncidentConfig
         | PublicSecretIncidentConfig
-        | TeamConfig
-        | MemberConfig
-        | DeveloperConfig
-        | AuditLogConfig
-        | CustomTagConfig
+        | GitGuardianTeamConfig
+        | GitGuardianMemberConfig
+        | GitGuardianDeveloperConfig
+        | GitGuardianAuditLogConfig
+        | GitGuardianCustomTagConfig
         | ResourceConfig
     ]
