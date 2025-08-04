@@ -1,12 +1,13 @@
 import httpx
 from httpx import URL
+from enum import StrEnum
 from typing import AsyncGenerator, Optional, Any
 from port_ocean.utils import http_async_client
 from loguru import logger 
 
 PAGE_SIZE = 50
 
-class Endpoints:
+class Endpoints(StrEnum):
     AUDIT_LOGS = "audit_logs"
     CUSTOM_TAGS = "custom_tags"
     DEVELOPERS = "public-perimeter/developers"
@@ -142,11 +143,11 @@ class GitGuardianClient:
         async for members in self._send_api_request(endpoint=Endpoints.MEMBERS):
             yield members
 
-    async def get_single_member(self, member_id: str) -> dict[str, Any]:   
+    async def get_single_member(self, member_id: int) -> dict[str, Any]:   
         logger.info(f"Fetching specific GitGuardian workspace member.")
         return await self._send_api_request(endpoint=f"{Endpoints.MEMBERS}/{member_id}")
     
-    async def get_member_teams(self, member_id: str) -> AsyncGenerator[list[dict[str, Any]], None]:
+    async def get_member_teams(self, member_id: int) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all members of the GitGuardian workspace.")
         async for member_teams in self._send_api_request(endpoint=f"{Endpoints.MEMBERS}/{member_id}/teams"):
             yield member_teams
