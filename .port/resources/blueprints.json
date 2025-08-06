@@ -5,6 +5,11 @@
         "icon": "Code",
         "schema": {
             "properties": {
+                "id": {
+                    "title": "Source ID",
+                    "type": "number",
+                    "description": "The unique GitGuardian source ID"
+                },
                 "sourceType": {                    
                     "title": "Source Type",
                     "type": "string",
@@ -261,6 +266,156 @@
                     "description": "The total number of resolved incidents for this Secret Detector"
                 }
             },
+            "required": []
+        },
+        "relations": {}
+    },
+    {
+        "identifier": "gitguardianInternalSecretIncident",
+        "title": "GitGuardian Internal Secret Incident",
+        "icon": "Alert",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "Incident ID",
+                        "type": "number",
+                        "description": "The unique internal secret incident ID"
+                    },
+                    "date": {
+                        "title": "Incident Detection Date",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was detected",
+                        "format": "date-time"
+                    },
+                    "detector": {
+                        "title": "Secret Detector Details",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Detector Name",
+                                "type": "string",
+                                "description": "The Secret Detector name"
+                            },
+                            "display_name": {
+                                "title": "Detector Display Name",
+                                "type": "string",
+                                "description": "The Secret Detector display name"
+                            },
+                            "nature": {
+                                "title": "Detector Type",
+                                "type": "string",
+                                "description": "The type of Secret Detector",
+                                "enum": [
+                                    "SPECIFIC",
+                                    "GENERIC",
+                                    "CUSTOM"
+                                ]
+                            },
+                            "family": {
+                                "title": "Detector Family",
+                                "type": "string",
+                                "description": "The Secret Detector family"
+                            },
+                            "detectorGroupName": {
+                                "title": "Detector Group Name",
+                                "type": "string",
+                                "description": "The Secret Detector group name"
+                            },
+                            "detectorGroupDisplayName": {
+                                "title": "Detector Group Display Name",
+                                "type": "string",
+                                "description": "The Secret Detector group display name"
+                            }                            
+                        }
+                    },
+                    "secretId": {
+                        "title": "Secret ID",
+                        "type": "number",
+                        "description": "The unique secret ID"
+                    },
+                    "gitguardianUrl": {
+                        "title": "Incident URL",
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to incident in GitGuardian"
+                    },
+                    "regression": {
+                        "title": "Regression",
+                        "type": "boolean",
+                        "description": "Indicates if it is a regression"
+                    },
+                    "status": {
+                        "title": "Incident Status",
+                        "type": "string",
+                        "description": "The status of the internal secret incident",
+                        "enum": [
+                            "IGNORED",
+                            "TRIGGERED",
+                            "ASSIGNED",
+                            "RESOLVED"
+                        ]
+                    },
+                    "occurrencesCount": {
+                        "title": "Incident Occurrences",
+                        "type": "number",
+                        "description": "The amount of times this specific internal secret incident was detected"
+                    },
+                    "ignoreReason": {
+                        "title": "Ignore Reason",
+                        "type": "string",
+                        "description": "The reason an internal secret incident was ignored"
+                    },
+                    "ignoredAt": {
+                        "title": "Ignore At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was ignored",
+                        "format": "date-time"
+                    },
+                    "secretRevoked": {
+                        "title": "Secret Revoked",
+                        "type": "boolean",
+                        "description": "Indicates if the secret has been revoked or not"
+                    },
+                    "severity": {
+                        "title": "Incident Severity",
+                        "type": "string",
+                        "description": "The severity of the internal secret incident",
+                        "enum": [
+                            "CRITICAL",
+                            "HIGH",
+                            "MEDIUM",
+                            "LOW",
+                            "INFO",
+                            "UNKNOWN"
+                        ],
+                        "enumColors": {
+                            "LOW": "green",
+                            "UNKNOWN": "yellow",
+                            "INFO": "yellow",
+                            "MEDIUM": "orange",
+                            "HIGH": "red",
+                            "CRITICAL": "red"
+                        }
+                    },
+                    "validity": {
+                        "title": "Incident Validity",
+                        "type": "string",
+                        "description": "The validity of the internal secret incident",
+                        "enum": [
+                            "VALID",
+                            "INVALID",
+                            "FAILED_TO_CHECK",
+                            "NO_CHECKER",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "resolved_at": {
+                        "title": "Resolved At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was resolved",
+                        "format": "date-time"
+                    }
+                },
             "required": []
         },
         "relations": {}
