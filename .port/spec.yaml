@@ -1,15 +1,36 @@
-description: gitGuardian integration for Port Ocean
-icon: Cookiecutter  # Should be one of the available icons in Port
+title: GitGuardian
+description: Git Guardian integration for Port Ocean
+icon: Lock  # Should be one of the available icons in Port
 features:
   - type: exporter
-    section: Under Development  # Should be one of the available sections in Port
+    section: Code Quality & Security
     resources:
-      - kind: gitguardian-example-kind
-      # - kind: <ResourceName2>
+      - kind: source
+      - kind: secret_detector
+      - kind: internal_secret_incident
+      - kind: public_secret_incident
+      - kind: team
+      - kind: member
+      - kind: developer
+      - kind: audit_log
+      - kind: custom_tag
 configurations:
-  - name: mygitguardianToken
-    # required: true
+  - name: gitGuardianApiBaseUrl
+    required: true
+    type: string
+    sensitive: false
+    description: The Base URL of the GitGuardian API.
+  - name: gitGuardianApiToken
+    required: true
     type: string
     sensitive: true
-  - name: someApplicationUrl
-    type: url
+    description: The API token required to auth against the GitGuardian API.
+  - name: gitGuardianApiVersion
+    required: true
+    type: string
+    sensitive: false
+    description: The version of the GitGuardian API.
+saas:
+  enabled: true
+  liveEvents:
+    enabled: true

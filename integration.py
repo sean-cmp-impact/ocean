@@ -12,7 +12,7 @@ class ObjectKind(StrEnum):
     PUBLIC_SECRET_INCIDENT = "public_secret_incident"
     TEAM = "team"
     MEMBER = "member"
-    DEVELOPER = "member"
+    DEVELOPER = "developer"
     AUDIT_LOG = "audit_log"
     CUSTOM_TAG = "custom_tag"
 
