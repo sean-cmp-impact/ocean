@@ -182,5 +182,87 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianSecretDetector",
+        "title": "GitGuardian Secret Detector",
+        "icon": "ManageSearch",
+        "schema": {
+            "properties": {
+                "name": {
+                    "title": "Detector Name",
+                    "type": "string",
+                    "description": "The name of the Secret Detector"
+                },
+                "displayName": {
+                    "title": "Detector Display Name",
+                    "type": "string",
+                    "description": "The display name of the Secret Detector"
+                },
+                "type": {
+                    "title": "Detector Type",
+                    "type": "string",
+                    "description": "The type of Secret Detector",
+                    "enum": [
+                        "SPECIFIC",
+                        "GENERIC",
+                        "CUSTOM"
+                    ]
+                }, 
+                "category": {
+                    "title": "Detector Category",
+                    "type": "string",
+                    "description": "The Secret Detector category"
+                },       
+                "isActive": {
+                    "title": "Detector Active",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector is active or not"
+                },
+                "scansCodeOnly": {
+                    "title": "Scans Code Only",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector only scans code"
+                },
+                "checkable": {
+                    "title": "Checkable",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector is checkable"
+                },
+                "useWithValidityCheckDisabled": {
+                    "title": "Use With Validity Check Disabled",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector can be used with validity check disabled"
+                },
+                "frequency": {
+                    "title": "Detector Frequency",
+                    "type": "string",
+                    "description": "The Secret Detector frequency"
+                }, 
+                "removed_at": {
+                    "title": "Removed At",
+                    "type": "string",
+                    "description": "The date and time that the Secret Detector was removed",
+                    "format": "date-time"
+                },
+                "openIncidentsCount": {
+                    "title": "Open Incidents Count",
+                    "type": "number",
+                    "description": "The total number of open incidents for this Secret Detector"
+                },
+                "ignoredIncidentsCount": {
+                    "title": "Ignored Incidents Count",
+                    "type": "number",
+                    "description": "The total number of ignored incidents for this Secret Detector"
+                },
+                "resolvedIncidentsCount": {
+                    "title": "Resolved Incidents Count",
+                    "type": "number",
+                    "description": "The total number of resolved incidents for this Secret Detector"
+                }
+            },
+            "required": []
+        },
+        "relations": {}
     }
 ]
