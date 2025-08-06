@@ -1,38 +1,183 @@
 [
     {
-        "identifier": "gitguardianExampleBlueprint",
-        "title": "gitGuardian Example",
-        "icon": "Blueprint",
+        "identifier": "gitguardianSource",
+        "title": "GitGuardian Source",
+        "icon": "Code",
         "schema": {
             "properties": {
-                "status": {
+                "sourceType": {                    
+                    "title": "Source Type",
                     "type": "string",
+                    "description": "The GitGuardian source type"
+                },
+                "fullName": {                    
+                    "title": "Source Name",                    
+                    "type": "string",
+                    "description": "The full name of the GitGuardian source"
+                },
+                "url": {
+                    "title": "Project URL",
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to the GitGuardian source"
+                },
+                "health": {
+                    "title": "Source Health",
+                    "type": "string",
+                    "description": "The health of the GitGuardian source",
                     "enum": [
-                        "VALID",
-                        "FAILED"
+                        "SAFE",
+                        "UNKNOWN",
+                        "AT_RISK"
                     ],
                     "enumColors": {
-                        "VALID": "green",
-                        "FAILED": "red"
-                    },
-                    "title": "Status"
+                        "SAFE": "green",
+                        "UNKNOWN": "yellow",
+                        "AT_RISK": "red"
+                    }
                 },
-                "text": {
+                "sourceCriticality": {
+                    "title": "Source Criticality",
                     "type": "string",
-                    "title": "Text"
+                    "description": "The criticality of the GitGuardian source",
+                    "enum": [
+                        "CRITICAL",
+                        "HIGH",
+                        "MEDIUM",
+                        "LOW",
+                        "UNKNOWN"
+                    ],
+                    "enumColors": {
+                        "LOW": "green",
+                        "UNKNOWN": "yellow",
+                        "MEDIUM": "orange",
+                        "HIGH": "red",
+                        "CRITICAL": "red"
+                    }
                 },
-                "component": {
-                    "type": "string",
-                    "title": "Component"
-                },
-                "service": {
-                    "type": "string",
-                    "title": "Service"
-                },
-                "score": {
+                "openIncidentsCount": {
+                    "title": "Open Incident Count",
                     "type": "number",
-                    "title": "Score"
-                }
+                    "description": "The total number of open incidents of the GitGuardian source"
+                },
+                "openIncidentsSeverityBreakdown": {
+                    "type": "object",
+                    "title": "Open Incidents Severity Breakdown",
+                    "properties": {
+                        "critical": {
+                            "title": "Total Incidents - Critical Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with critical severity that are still open"
+                        },
+                        "high": {
+                            "title": "Total Incidents - High Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with high severity that are still open"
+                        },
+                        "medium": {
+                            "title": "Total Incidents - Medium Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with medium severity that are still open"
+                        },
+                        "low": {
+                            "title": "Total Incidents - Low Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with low severity that are still open"
+                        },
+                        "unknown": {
+                            "title": "Total Incidents - Unknown Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with an unknown severity that are still open"
+                        }
+                    }
+                }, 
+                "closedIncidentsCount": {
+                    "title": "Closed Incident Count",
+                    "type": "number",
+                    "description": "The total number of closed incidents of the GitGuardian source"
+                },
+                "closedIncidentsSeverityBreakdown": {
+                    "type": "object",
+                    "title": "Closed Incidents Severity Breakdown",
+                    "properties": {
+                        "critical": {
+                            "title": "Total Incidents - Critical Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with critical severity that are closed"
+                        },
+                        "high": {
+                            "title": "Total Incidents - High Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with high severity that are closed"
+                        },
+                        "medium": {
+                            "title": "Total Incidents - Medium Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with medium severity that are closed"
+                        },
+                        "low": {
+                            "title": "Total Incidents - Low Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with low severity that are closed"
+                        },
+                        "unknown": {
+                            "title": "Total Incidents - Unknown Severity",
+                            "type": "number",
+                            "description": "The total number of incidents with an unknown severity that are closed"
+                        }
+                    }
+                },
+                "lastScan": {
+                    "type": "object",
+                    "title": "Closed Incidents Severity Breakdown",
+                    "properties": {
+                        "date": {
+                            "title": "Last Scan Date",
+                            "type": "string",
+                            "description": "The date this GitGuardian source was scanned",
+                            "format": "date-time"
+                        },
+                        "status": {                    
+                            "title": "Status of Scan",
+                            "type": "string",
+                            "description": "The status of the last scan "
+                        },
+                        "failingReason": {                    
+                            "title": "Failing Reason",
+                            "type": "string",
+                            "description": "The reason description of a possible scan failure"
+                        },
+                        "commitScanned": {
+                            "title": "Commits Scanned",
+                            "type": "number",
+                            "description": "The total number of commits scanned"
+                        },
+                        "duration": {
+                            "title": "Scan Duration",
+                            "type": "string",
+                            "description": "The total time in seconds that it took to complete the scan"
+                        },
+                        "branchesScanned": {
+                            "title": "Branches Scanned",
+                            "type": "number",
+                            "description": "The total number of branches scanned"
+                        },
+                        "progress": {
+                            "title": "Scan Progress",
+                            "type": "number",
+                            "description": "The progress of the scan"
+                        }
+                    }
+                },
+                "visibility": {
+                    "title": "Source Visibility",
+                    "type": "string",
+                    "description": "The visibility of the GitGuardian source",
+                    "enum": [
+                        "PRIVATE",
+                        "PUBLIC"
+                    ]
+                }         
             },
             "required": []
         },
