@@ -142,3 +142,20 @@ resources:
             description: .description
             isGlobal: .is_global
             gitguardianUrl: .gitguardian_url
+  - kind: workspace_member
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: .name
+          blueprint: '"gitguardianWorkspaceMember"'
+          properties:
+            id: .id
+            name: .name
+            email: .email
+            accessLevel: .access_level
+            active: .active
+            createdAt: .created_at
+            lastLogin: .last_login
