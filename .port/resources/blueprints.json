@@ -666,5 +666,31 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianCustomTag",
+        "title": "GitGuardian Custom Tag",
+        "icon": "General",
+        "schema": {
+            "properties": {                    
+                    "id": {
+                        "title": "Custom Tag ID",
+                        "type": "string",
+                        "description": "The unique GitGuardian custom tag ID"
+                    },
+                    "key": {
+                        "title": "Key",
+                        "type": "string",
+                        "description": "The key of the GitGuardian custom tag"
+                    },
+                    "value": {
+                        "title": "Value",
+                        "type": "string",
+                        "description": "The value of the GitGuardian custom tag"
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
