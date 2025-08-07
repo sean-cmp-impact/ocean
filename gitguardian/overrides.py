@@ -72,7 +72,7 @@ class GitGuardianTeamConfig(ResourceConfig):
     kind: Literal["team"]
 
 
-class GitGuardianMemberSelector(Selector):
+class GitGuardianWorkspaceMemberSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
@@ -80,9 +80,22 @@ class GitGuardianMemberSelector(Selector):
     )
 
 
-class GitGuardianMemberConfig(ResourceConfig):
-    selector: GitGuardianMemberSelector
-    kind: Literal["member"]
+class GitGuardianWorkspaceMemberConfig(ResourceConfig):
+    selector: GitGuardianWorkspaceMemberSelector
+    kind: Literal["workspace_member"]
+
+
+class GitGuardianTeamMemberSelector(Selector):
+    filter_query: str | None = None
+    fields: str | None = Field(
+        description="Additional fields to be included in the API response",
+        default="*all",
+    )
+
+
+class GitGuardianTeamMemberConfig(ResourceConfig):
+    selector: GitGuardianTeamMemberSelector
+    kind: Literal["team_member"]
 
 
 class GitGuardianDeveloperSelector(Selector):
@@ -131,7 +144,8 @@ class GitGuardianPortAppConfig(PortAppConfig):
         | InternalSecretIncidentConfig
         | PublicSecretIncidentConfig
         | GitGuardianTeamConfig
-        | GitGuardianMemberConfig
+        | GitGuardianWorkspaceMemberConfig
+        | GitGuardianTeamMemberConfig
         | GitGuardianDeveloperConfig
         | GitGuardianAuditLogConfig
         | GitGuardianCustomTagConfig

@@ -10,7 +10,8 @@ features:
       - kind: internal_secret_incident
       - kind: public_secret_incident
       - kind: team
-      - kind: member
+      - kind: team_member
+      - kind: workspace_member
       - kind: developer
       - kind: audit_log
       - kind: custom_tag

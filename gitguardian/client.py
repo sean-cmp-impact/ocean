@@ -14,7 +14,7 @@ class Endpoints(StrEnum):
     HEALTH = "health"
     INTERNAL_SECRET_INCIDENTS = "incidents/secrets"
     INTERNAL_SECRET_OCCURRENCES = "occurrences/secrets"
-    MEMBERS = "members"
+    WORKSPACE_MEMBERS = "members"
     PUBLIC_SECRET_INCIDENTS = "public-incidents/secrets"
     SOURCES = "sources"
     SECRET_DETECTORS = "secret_detectors"
@@ -138,18 +138,18 @@ class GitGuardianClient:
         async for occurrences in self._send_api_request(endpoint=Endpoints.INTERNAL_SECRET_OCCURRENCES):
             yield occurrences
 
-    async def get_members(self) -> AsyncGenerator[list[dict[str, Any]], None]:
+    async def get_workspace_members(self) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all members of the GitGuardian workspace.")
-        async for members in self._send_api_request(endpoint=Endpoints.MEMBERS):
+        async for members in self._send_api_request(endpoint=Endpoints.WORKSPACE_MEMBERS):
             yield members
 
     async def get_single_member(self, member_id: int) -> dict[str, Any]:   
         logger.info(f"Fetching specific GitGuardian workspace member.")
-        return await self._send_api_request(endpoint=f"{Endpoints.MEMBERS}/{member_id}")
+        return await self._send_api_request(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
     
     async def get_member_teams(self, member_id: int) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all members of the GitGuardian workspace.")
-        async for member_teams in self._send_api_request(endpoint=f"{Endpoints.MEMBERS}/{member_id}/teams"):
+        async for member_teams in self._send_api_request(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}/teams"):
             yield member_teams
 
     async def get_public_secret_incidents(self) -> AsyncGenerator[list[dict[str, Any]], None]:

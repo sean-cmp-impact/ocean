@@ -5,7 +5,8 @@ from gitguardian.overrides import (
      GitGuardianAuditLogConfig,
      GitGuardianCustomTagConfig,
      GitGuardianDeveloperConfig,
-     GitGuardianMemberConfig,
+     GitGuardianWorkspaceMemberConfig,
+     GitGuardianTeamMemberConfig,
      GitGuardianSourceConfig,
      GitGuardianSecretDetectorConfig,
      GitGuardianTeamConfig,
@@ -82,15 +83,26 @@ async def on_resync_teams(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
         logger.info(f"Received teams batch with {len(teams)} incidents")
         yield teams
 
-@ocean.on_resync(ObjectKind.MEMBER)
+@ocean.on_resync(ObjectKind.WORKSPACE_MEMBER)
 async def on_resync_members(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client() 
 
-    # selector = cast(GitGuardianMemberConfig, event.resource_config).selector
+    # selector = cast(GitGuardianWorkspaceMemberConfig, event.resource_config).selector
     params = {}
 
-    async for members in gitguardian_client.get_members(params):
-        logger.info(f"Received members batch with {len(members)} members")
+    async for members in gitguardian_client.get_workspace_members(params):
+        logger.info(f"Received workspace members batch with {len(members)} members")
+        yield members
+
+@ocean.on_resync(ObjectKind.TEAM_MEMBER)
+async def on_resync_members(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client() 
+
+    # selector = cast(GitGuardianTeamMemberConfig, event.resource_config).selector
+    params = {}
+
+    async for members in gitguardian_client.get_team_membership(params):
+        logger.info(f"Received team members batch with {len(members)} members")
         yield members
 
 @ocean.on_resync(ObjectKind.DEVELOPER)
