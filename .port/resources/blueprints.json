@@ -244,7 +244,7 @@
                     "type": "string",
                     "description": "The Secret Detector frequency"
                 }, 
-                "removed_at": {
+                "removedAt": {
                     "title": "Removed At",
                     "type": "string",
                     "description": "The date and time that the Secret Detector was removed",
@@ -305,7 +305,7 @@
                                 "type": "string",
                                 "description": "The Secret Detector name"
                             },
-                            "display_name": {
+                            "displayName": {
                                 "title": "Detector Display Name",
                                 "type": "string",
                                 "description": "The Secret Detector display name"
@@ -418,7 +418,7 @@
                             "UNKNOWN"
                         ]
                     },
-                    "resolved_at": {
+                    "resolvedAt": {
                         "title": "Resolved At",
                         "type": "string",
                         "description": "The date and time that the internal secret incident was resolved",

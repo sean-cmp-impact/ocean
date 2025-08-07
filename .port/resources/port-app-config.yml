@@ -40,3 +40,26 @@ resources:
               branchesScanned: .last_scan.branches_scanned
               progress: .last_scan.progress
             visibility: .visibility
+  - kind: secret_detector
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .name
+          title: .display_name
+          blueprint: '"gitguardianSecretDetector"'
+          properties:
+            name: .name
+            displayName: .display_name
+            type: .type
+            category: .category
+            isActive: .is_active
+            scansCodeOnly: .scans_code_only
+            checkable: .checkable
+            useWithValidityCheckDisabled: .use_with_validity_check_disabled
+            frequency: .frequency
+            removedAt: .removed_at
+            openIncidentsCount: .open_incidents_count
+            ignoredIncidentsCount: .ignored_incidents_count
+            resolvedIncidentsCount: .resolved_incidents_count
