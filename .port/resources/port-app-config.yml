@@ -1,16 +1,42 @@
 resources:
-  - kind: gitguardian-example-kind
+  - kind: source
     selector:
       query: 'true'
     port:
       entity:
         mappings:
-          identifier: .my_custom_id
-          title: '(.my_component + " @ " + .my_service)'
-          blueprint: '"gitguardianExampleBlueprint"'
+          identifier: .id
+          title: '(.type + " - " + .full_name)'
+          blueprint: '"gitguardianSource"'
           properties:
-            status: .my_enum
-            text: .my_custom_text
-            component: .my_component
-            service: .my_service
-            score: .my_special_score
+            id: .my_enum
+            sourceType: .type
+            fullName: .full_name
+            url: .url
+            health: .health
+            sourceCriticality: .source_criticality
+            openIncidentsCount: .open_incidents_count
+            openIncidentsSeverityBreakdown:
+              critical: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
+              high: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
+              medium: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
+              low: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
+              info: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
+              unknown: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
+            closedIncidentsCount: .closed_incidents_count
+            closedIncidentsSeverityBreakdown:
+              critical: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
+              high: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
+              medium: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
+              low: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
+              info: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
+              unknown: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
+            lastScan:
+              date: .last_scan.date
+              status: .last_scan.status
+              failingReason: .last_scan.failing_reason
+              commitScanned: .last_scan.commits_scanned
+              duration: .last_scan.duration
+              branchesScanned: .last_scan.branches_scanned
+              progress: .last_scan.progress
+            visibility: .visibility
