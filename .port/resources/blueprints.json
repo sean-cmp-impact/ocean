@@ -614,5 +614,57 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianAuditLog",
+        "title": "GitGuardian Audit Log",
+        "icon": "AuditLog",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "Log ID",
+                        "type": "number",
+                        "description": "The GitGuardian audit log ID"
+                    },
+                    "date": {
+                        "title": "Date",
+                        "type": "string",
+                        "description": "The timestamp of the GitGuardian log",
+                        "format": "date-time"
+                    },
+                    "memberEmail": {
+                        "title": "Member Email",
+                        "type": "string",
+                        "description": "The email address of the workspace member"
+                    },
+                    "memberName": {
+                        "title": "Member Name",
+                        "type": "string",
+                        "description": "The name of the GitGuardian workspace member"
+                    },
+                    "memberId": {
+                        "title": "Member ID",
+                        "type": "number",
+                        "description": "The unique ID of the GitGuardian workspace member"
+                    },
+                    "actionType": {
+                        "title": "Action Type",
+                        "type": "string",
+                        "description": "The GitGuardian audit log action type"
+                    },
+                    "eventName": {
+                        "title": "Event Name",
+                        "type": "string",
+                        "description": "The GitGuardian audit log event name"
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "string",
+                        "description": "The GitGuardian audit log data"
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
