@@ -211,3 +211,16 @@ resources:
             actionType: .action_type
             eventName: .event_name
             data: .data
+  - kind: custom_tag
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: .key
+          blueprint: '"gitguardianCustomTag"'
+          properties:
+            id: .id
+            key: .key
+            value: .value
