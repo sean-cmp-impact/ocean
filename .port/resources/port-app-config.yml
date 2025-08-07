@@ -193,3 +193,21 @@ resources:
             githubId: .github_id
             githubLogin: .github_login
             avatarUrl: .avatar_url
+  - kind: audit_log
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: '(.date + " - " " + .event_name)'
+          blueprint: '"gitguardianAuditLog"'
+          properties:
+            id: .id
+            date: .date
+            memberEmail: .member_email
+            memberName: .member_name
+            memberId: .member_id
+            actionType: .action_type
+            eventName: .event_name
+            data: .data
