@@ -127,3 +127,18 @@ resources:
             validity: .validity
             resolvedAt: .resolved_at
             shareUrl: share_url
+  - kind: team
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: .name
+          blueprint: '"gitguardianTeam"'
+          properties:
+            id: .id
+            name: .name
+            description: .description
+            isGlobal: .is_global
+            gitguardianUrl: .gitguardian_url
