@@ -614,6 +614,12 @@
                         "title": "GitHub Login",
                         "type": "string",
                         "description": "The Developer's GitHub Login"
+                    },
+                    "avatarUrl": {
+                        "title": "Avatar URL",
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL of the GitGuardian Developer's avatar"
                     }
                 },
             "required": []

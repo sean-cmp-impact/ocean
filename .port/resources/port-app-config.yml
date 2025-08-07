@@ -174,3 +174,22 @@ resources:
             teamId: .team_id
             isTeamLeader: .is_team_leader
             incidentPermission: .incident_permission
+  - kind: developer
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: '(.type + ":" " + .name)'
+          blueprint: '"gitguardianDeveloper"'
+          properties:
+            id: .id
+            name: .name
+            type: .type
+            emails: .emails
+            firstLinkedAt: .first_linked_at
+            isActive: .is_active
+            githubId: .github_id
+            githubLogin: .github_login
+            avatarUrl: .avatar_url
