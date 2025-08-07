@@ -465,5 +465,59 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianWorkspaceMember",
+        "title": "GitGuardian Workspace Member",
+        "icon": "User",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "Member ID",
+                        "type": "number",
+                        "description": "The unique GitGuardian workspace member ID"
+                    },
+                    "name": {
+                        "title": "Member Name",
+                        "type": "string",
+                        "description": "The name of the workspace member"
+                    },
+                    "email": {
+                        "title": "Member Email",
+                        "type": "string",
+                        "description": "The email address of the workspace member"
+                    },
+                    "accessLevel": {
+                        "title": "Access Level",
+                        "type": "string",
+                        "description": "The level of access that the workspace member has",
+                        "enum": [
+                            "OWNER",
+                            "MANAGER",
+                            "MEMBER",
+                            "RESTRICTED"
+                        ]
+                    },
+                    "active": {
+                        "title": "Active",
+                        "type": "boolean",
+                        "description": "Indicates if the member is active or not"
+                    },
+                    "createdAt": {
+                        "title": "Created At",
+                        "type": "string",
+                        "description": "The date and time the workspace member was created",
+                        "format": "date-time"
+                    },
+                    "lastLogin": {
+                        "title": "Last Login",
+                        "type": "string",
+                        "description": "The date and time the workspace member has last logged into GitGuardian",
+                        "format": "date-time"
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
