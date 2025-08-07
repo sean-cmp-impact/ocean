@@ -559,5 +559,60 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianDeveloper",
+        "title": "GitGuardian Developer",
+        "icon": "Rocket",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "Developer ID",
+                        "type": "number",
+                        "description": "The unique GitGuardian Developer ID"
+                    },
+                    "name": {
+                        "title": "Developer Name",
+                        "type": "string",
+                        "description": "The name of the GitGuardian Developer"
+                    },
+                    "type": {
+                        "title": "Developer Type",
+                        "type": "string",
+                        "description": "The GitGuardian Developer type"
+                    },
+                    "emails": {
+                        "title": "Emails",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Email addresses of the Developer"
+                    },
+                    "firstLinkedAt": {
+                        "title": "First Linked At",
+                        "type": "string",
+                        "description": "The date and time the GitGuardian Developer was first linked",
+                        "format": "date-time"
+                    },
+                    "isActive": {
+                        "title": "Is Active",
+                        "type": "boolean",
+                        "description": "Indicates if the developer is active or not"
+                    },
+                    "githubId": {
+                        "title": "GitHub ID",
+                        "type": "number",
+                        "description": "The Developer's GitHub ID"
+                    },
+                    "githubLogin": {
+                        "title": "GitHub Login",
+                        "type": "string",
+                        "description": "The Developer's GitHub Login"
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
