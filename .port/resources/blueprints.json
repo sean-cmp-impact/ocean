@@ -271,8 +271,8 @@
         "relations": {}
     },
     {
-        "identifier": "gitguardianInternalSecretIncident",
-        "title": "GitGuardian Internal Secret Incident",
+        "identifier": "gitguardianSecretIncident",
+        "title": "GitGuardian Secret Incident",
         "icon": "Alert",
         "schema": {
             "properties": {
@@ -280,6 +280,15 @@
                         "title": "Incident ID",
                         "type": "number",
                         "description": "The unique internal secret incident ID"
+                    },
+                    "exposure": {
+                        "title": "Secret Exposure",
+                        "type": "string",
+                        "description": "Indicates the secret's level of exposore",
+                        "enum": [
+                            "INTERNAL",
+                            "PUBLIC"
+                        ]
                     },
                     "date": {
                         "title": "Incident Detection Date",
