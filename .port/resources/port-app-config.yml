@@ -159,3 +159,18 @@ resources:
             active: .active
             createdAt: .created_at
             lastLogin: .last_login
+  - kind: team_member
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: '(.member_id + ": " + .incident_permission)'
+          blueprint: '"gitguardianTeamMember"'
+          properties:
+            id: .id
+            memberId: .member_id
+            teamId: .team_id
+            isTeamLeader: .is_team_leader
+            incidentPermission: .incident_permission
