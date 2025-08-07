@@ -519,5 +519,45 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianTeamMember",
+        "title": "GitGuardian Team Member",
+        "icon": "User",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "ID",
+                        "type": "number",
+                        "description": "The unique membership ID"
+                    },
+                    "memberId": {
+                        "title": "Member ID",
+                        "type": "number",
+                        "description": "The unique member ID"
+                    },
+                    "teamId": {
+                        "title": "Team ID",
+                        "type": "number",
+                        "description": "The unique GitGuardian team ID"
+                    },
+                    "isTeamLeader": {
+                        "title": "Is Team Leader",
+                        "type": "boolean",
+                        "description": "Indicates if the member is a team leader or not"
+                    },
+                    "incidentPermission": {
+                        "title": "Incident Permission",
+                        "type": "string",
+                        "description": "The incident permissions that the member has in this team",
+                        "enum": [
+                            "CAN_MANAGE",
+                            "CANNOT_MANAGE"
+                        ]
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
