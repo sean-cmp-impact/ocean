@@ -428,5 +428,42 @@
             "required": []
         },
         "relations": {}
+    },
+    {
+        "identifier": "gitguardianTeam",
+        "title": "GitGuardian Team",
+        "icon": "Team",
+        "schema": {
+            "properties": {
+                    "id": {
+                        "title": "Team ID",
+                        "type": "number",
+                        "description": "The unique GitGuardian team ID"
+                    },
+                    "name": {
+                        "title": "Team Name",
+                        "type": "string",
+                        "description": "The name of the GitGuardian Team"
+                    },
+                    "description": {
+                        "title": "Team Description",
+                        "type": "string",
+                        "description": "A description of the GitGuardian Team"
+                    },
+                    "isGlobal": {
+                        "title": "Is Global",
+                        "type": "boolean",
+                        "description": "Indicates if the team is global or not"
+                    },
+                    "gitguardianUrl": {
+                        "title": "GitGuardian URL",
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to the team in GitGuardian"
+                    }
+                },
+            "required": []
+        },
+        "relations": {}
     }
 ]
