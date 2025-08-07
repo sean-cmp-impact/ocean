@@ -63,3 +63,35 @@ resources:
             openIncidentsCount: .open_incidents_count
             ignoredIncidentsCount: .ignored_incidents_count
             resolvedIncidentsCount: .resolved_incidents_count
+  - kind: internal_secret_incident
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: '(.id + ": " + .detector.name)'
+          blueprint: '"gitguardianSecretIncident"'
+          properties:
+            id: .id
+            exposure: "internal"
+            date: .date
+            detector:
+              name: .detector.name
+              displayName: .detector.display_name
+              nature: .detector.nature
+              family: .detector.family
+              detectorGroupName: .detector.detector_group_name
+              detectorGroupDisplayName: .detector.detector_group_display_name
+            secretId: .secret_id
+            gitguardianUrl: .gitguardian_url
+            regression: .regression
+            status: .status
+            occurrencesCount: .occurrences_count
+            ignoreReason: .ignore_reason
+            ignoredAt: .ignored_at
+            secretRevoked: .secret_revoked
+            severity: .severity
+            validity: .validity
+            resolvedAt: .resolved_at
+            shareUrl: share_url

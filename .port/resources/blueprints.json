@@ -423,6 +423,11 @@
                         "type": "string",
                         "description": "The date and time that the internal secret incident was resolved",
                         "format": "date-time"
+                    },
+                    "shareUrl": {
+                        "title": "Share URL",
+                        "type": "string",
+                        "format": "url"
                     }
                 },
             "required": []
