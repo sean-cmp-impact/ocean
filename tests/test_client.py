@@ -118,7 +118,7 @@ async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianC
 async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
-    secret_incident_data: dict[str, Any] = get_single_mocked_secret_incident(incident_id)
+    secret_incident_data: dict[str, Any] = get_single_mocked_internal_secret_incident(incident_id)
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -128,6 +128,21 @@ async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitG
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.INTERNAL_SECRET_INCIDENTS}/{incident_id}")
         assert result == secret_incident_data
+
+@pytest.mark.asyncio
+async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_single_internal_secret_incident method"""
+    incident_id = 3970
+    public_secret_incident_data: dict[str, Any] = get_single_mocked_public_secret_incident(incident_id)
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.return_value = public_secret_incident_data
+        result = await mock_gitguardian_client.get_single_public_secret_incidents(incident_id)
+
+        mock_request.assert_called_once_with(endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}")
+        assert result == public_secret_incident_data
 
 def get_single_mocked_team(team_id: int):
     return {
@@ -201,7 +216,7 @@ def get_single_mocked_source(source_id: int):
         "deleted": False
     }
 
-def get_single_mocked_secret_incident(incident_id: int):
+def get_single_mocked_internal_secret_incident(incident_id: int):
     return {
         "id": incident_id,
         "date": "2019-08-22T14:15:22Z",
@@ -271,4 +286,67 @@ def get_single_mocked_secret_incident(incident_id: int):
             }
         ],
         "occurrences": None
+    }
+
+def get_single_mocked_public_secret_incident(incident_id: int):
+    return {
+        "id": incident_id,
+        "detector": {
+            "name": "slack_bot_token",
+            "display_name": "Slack Bot Token",
+            "nature": "specific",
+            "family": "apikey",
+            "detector_group_name": "slackbot_token",
+            "detector_group_display_name": "Slack Bot Token"
+        },
+        "date": "2019-08-22T14:15:22Z",
+        "secret_id": 1,
+        "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw/juCISuOMgPzYhV28m6OG24",
+        "hmsl_hash": "05975add34ddc9a38a0fb57c7d3e676ffed57080516fc16bf8d8f14308fedb86",
+        "occurrences_count": 4,
+        "status": "IGNORED",
+        "triggered_at": "2019-05-12T09:37:49Z",
+        "ignored_at": "2019-08-24T14:15:22Z",
+        "ignore_reason": "test_credential",
+        "ignorer_id": 309,
+        "ignorer_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
+        "resolved_at": None,
+        "resolver_id": 395,
+        "resolver_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
+        "secret_revoked": False,
+        "validity": "valid",
+        "severity": "high",
+        "assignee_id": 309,
+        "assignee_email": "eric@gitguardian.com",
+        "share_url": "https://dashboard.gitguardian.com/share/public-incidents/11111111-1111-1111-1111-111111111111",
+        "feedback_list": [
+            {
+                "created_at": "2021-05-20T12:40:55.662949Z",
+                "updated_at": "2021-05-20T12:40:55.662949Z",
+                "member_id": 42,
+                "email": "eric@gitguardian.com",
+                "answers": [
+                    {
+                        "type": "boolean",
+                        "field_ref": "actual_secret_yes_no",
+                        "field_label": "Is it an actual secret?",
+                        "boolean": True
+                    }
+                ]
+            }
+        ],
+        "declarative_secret_status": "revoked",
+        "resolve_reason": "string",
+        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/public-incidents/3899",
+        "tags": [
+            "FROM_HISTORICAL_SCAN",
+            "INTERNALLY_LEAKED"
+        ],
+        "custom_tags": [
+            {
+                "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+                "key": "env",
+                "value": "prod"
+            }
+        ]
     }
