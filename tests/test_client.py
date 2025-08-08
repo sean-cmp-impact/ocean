@@ -88,16 +88,16 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
 async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_team method"""
     team_id = 1313
-    workspace_member_data: dict[str, Any] = get_single_mocked_team(team_id)
+    team_data: dict[str, Any] = get_single_mocked_team(team_id)
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.return_value = workspace_member_data
+        mock_request.return_value = team_data
         result = await mock_gitguardian_client.get_single_team(team_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
-        assert result == workspace_member_data
+        assert result == team_data
 
 @pytest.mark.asyncio
 async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -113,6 +113,21 @@ async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianC
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
         assert result == workspace_member_data
+
+@pytest.mark.asyncio
+async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_single_internal_secret_incident method"""
+    incident_id = 3970
+    secret_incident_data: dict[str, Any] = get_single_mocked_secret_incident(incident_id)
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.return_value = secret_incident_data
+        result = await mock_gitguardian_client.get_single_internal_secret_incidents(incident_id)
+
+        mock_request.assert_called_once_with(endpoint=f"{Endpoints.INTERNAL_SECRET_INCIDENTS}/{incident_id}")
+        assert result == secret_incident_data
 
 def get_single_mocked_team(team_id: int):
     return {
@@ -184,4 +199,76 @@ def get_single_mocked_source(source_id: int):
         },
         "url": "https://github.com/TestGitHubOrg/test_repo",
         "deleted": False
+    }
+
+def get_single_mocked_secret_incident(incident_id: int):
+    return {
+        "id": incident_id,
+        "date": "2019-08-22T14:15:22Z",
+        "detector": {
+            "name": "slack_bot_token",
+            "display_name": "Slack Bot Token",
+            "nature": "specific",
+            "family": "apikey",
+            "detector_group_name": "slackbot_token",
+            "detector_group_display_name": "Slack Bot Token"
+        },
+        "secret_id": 1,
+        "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw/juCISuOMgPzYhV28m6OG24",
+        "hmsl_hash": "05975add34ddc9a38a0fb57c7d3e676ffed57080516fc16bf8d8f14308fedb86",
+        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/incidents/3899",
+        "regression": False,
+        "status": "IGNORED",
+        "assignee_id": 309,
+        "assignee_email": "eric@gitguardian.com",
+        "occurrences_count": 4,
+        "secret_presence": {
+            "files_requiring_code_fix": 1,
+            "files_pending_merge": 1,
+            "files_fixed": 1,
+            "outside_vcs": 1,
+            "removed_outside_vcs": 0,
+            "in_vcs": 3,
+            "removed_in_vcs": 0
+        },
+        "ignore_reason": "test_credential",
+        "triggered_at": "2019-05-12T09:37:49Z",
+        "ignored_at": "2019-08-24T14:15:22Z",
+        "ignorer_id": 309,
+        "ignorer_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
+        "resolver_id": 395,
+        "resolver_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
+        "secret_revoked": False,
+        "severity": "high",
+        "validity": "valid",
+        "resolved_at": None,
+        "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-1111-1111-1111-111111111111",
+        "tags": [
+            "FROM_HISTORICAL_SCAN",
+            "SENSITIVE_FILE"
+        ],
+        "custom_tags": [
+            {
+                "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+                "key": "env",
+                "value": "prod"
+            }
+        ],
+        "feedback_list": [
+            {
+                "created_at": "2021-05-20T12:40:55.662949Z",
+                "updated_at": "2021-05-20T12:40:55.662949Z",
+                "member_id": 42,
+                "email": "eric@gitguardian.com",
+                "answers": [
+                    {
+                        "type": "boolean",
+                        "field_ref": "actual_secret_yes_no",
+                        "field_label": "Is it an actual secret?",
+                        "boolean": True
+                    }
+                ]
+            }
+        ],
+        "occurrences": None
     }
