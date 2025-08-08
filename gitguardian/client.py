@@ -143,7 +143,7 @@ class GitGuardianClient:
         async for members in self._send_api_request(endpoint=Endpoints.WORKSPACE_MEMBERS):
             yield members
 
-    async def get_single_member(self, member_id: int) -> dict[str, Any]:   
+    async def get_single_workspace_member(self, member_id: int) -> dict[str, Any]:   
         logger.info(f"Fetching specific GitGuardian workspace member.")
         return await self._send_api_request(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
     

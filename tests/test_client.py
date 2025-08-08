@@ -72,8 +72,8 @@ async def test_send_api_request_failure(mock_gitguardian_client: GitGuardianClie
 @pytest.mark.asyncio
 async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_source method"""
-    source_data: dict[str, Any] = get_single_mocked_source()
     source_id = 123456789
+    source_data: dict[str, Any] = get_single_mocked_source(source_id)
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -84,9 +84,60 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.SOURCES}/{source_id}")
         assert result == source_data
 
-def get_single_mocked_source():
+@pytest.mark.asyncio
+async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_single_team method"""
+    team_id = 1313
+    workspace_member_data: dict[str, Any] = get_single_mocked_team(team_id)
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.return_value = workspace_member_data
+        result = await mock_gitguardian_client.get_single_team(team_id)
+
+        mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
+        assert result == workspace_member_data
+
+@pytest.mark.asyncio
+async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_single_workspace_member method"""
+    member_id = 3252
+    workspace_member_data: dict[str, Any] = get_single_mocked_workspace_member(member_id)
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.return_value = workspace_member_data
+        result = await mock_gitguardian_client.get_single_workspace_member(member_id)
+
+        mock_request.assert_called_once_with(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
+        assert result == workspace_member_data
+
+def get_single_mocked_team(team_id: int):
     return {
-        "id": 123456789,
+        "id": team_id,
+        "name": "feature team A",
+        "description": "Description of my team",
+        "is_global": False,
+        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/settings/user/teams/1"
+    }
+
+def get_single_mocked_workspace_member(member_id: int):
+    return {
+        "id": member_id,
+        "name": "John Doe",
+        "email": "john.doe@test.org",
+        "role": "owner",
+        "access_level": "owner",
+        "active": True,
+        "created_at": "2025-06-28T16:40:26.897Z",
+        "last_login": "2025-06-28T16:40:26.897Z"
+    }
+
+def get_single_mocked_source(source_id: int):
+    return {
+        "id": source_id,
         "type": "github",
         "full_name": "TestGitHubOrg/test_repo",
         "health": "at_risk",
