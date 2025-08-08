@@ -147,7 +147,7 @@ class GitGuardianClient:
 
     async def get_workspace_members(self) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all members of the GitGuardian workspace.")
-        async for members in self._send_api_request(endpoint=Endpoints.WORKSPACE_MEMBERS):
+        async for members in self._send_paginated_request(endpoint=Endpoints.WORKSPACE_MEMBERS):
             yield members
 
     async def get_single_workspace_member(self, member_id: int) -> dict[str, Any]:   
