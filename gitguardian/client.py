@@ -133,7 +133,7 @@ class GitGuardianClient:
     
     async def get_internal_secret_incidents(self) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching secret incidents detected by the GitGuardian dashboard.")
-        async for incidents in self._send_api_request(endpoint=Endpoints.INTERNAL_SECRET_INCIDENTS):
+        async for incidents in self._send_paginated_request(endpoint=Endpoints.INTERNAL_SECRET_INCIDENTS):
             yield incidents
 
     async def get_single_internal_secret_incidents(self, incident_id: int) -> dict[str, Any]:   
