@@ -53,8 +53,8 @@ async def test_send_api_request_success(mock_gitguardian_client: GitGuardianClie
         mock_request.return_value = Response(
             200, request=Request("GET", "/some_endpoint"), json={"key": "value"}
         )
-        response = await mock_gitguardian_client._get_api_response_json("GET", "/some_endpoint")
-        assert response["key"] == "value"
+        response = await mock_gitguardian_client._send_api_request("GET", "/some_endpoint")
+        assert response["data"]["key"] == "value"
 
 @pytest.mark.asyncio
 async def test_send_api_request_failure(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -75,7 +75,7 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
     source_data: dict[str, Any] = get_single_mocked_source(source_id)
 
     with patch.object(
-        mock_gitguardian_client, "_get_api_response_json", new_callable=AsyncMock
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = source_data
         result = await mock_gitguardian_client.get_single_source(source_id)
@@ -87,10 +87,12 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
 async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_team method"""
     team_id = 1313
-    team_data: dict[str, Any] = get_single_mocked_team(team_id, "feature team A")
+    team_data: dict[str, Any] = { 
+        "data": get_single_mocked_team(team_id, "feature team A")
+    }
 
     with patch.object(
-        mock_gitguardian_client, "_get_api_response_json", new_callable=AsyncMock
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = team_data
         result = await mock_gitguardian_client.get_single_team(team_id)
@@ -98,37 +100,34 @@ async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> No
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
         assert result == team_data
 
-# @pytest.mark.asyncio
-# async def test_get_paginated_teams(mock_gitguardian_client: GitGuardianClient) -> None:
-#     """Test get_paginated_teams method"""
-#     team_data: dict[str, Any] = [f"{get_single_mocked_team(1234, "feature team A")}", f"{get_single_mocked_team(5678, "feature team B")}"]
-    
-#     with patch.object(
-#         mock_gitguardian_client, "_send_paginated_request", new_callable=AsyncMock
-#     ) as mock_request:
-#         mock_request.side_effect = [
-#             team_data,
-#             [],  # Empty response to end pagination
-#         ]
-#         mock_request.return_value = Response(
-#             200, 
-#             headers={"link": f"<https://mockapi.gitguardian.com/v1/teams?cursor=cD0yMDM5NjE4MQ%3D%3D&per_page={PAGE_SIZE}>; rel='next'"},
-#             json=team_data
-#         )
+@pytest.mark.asyncio
+async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
+    cursor = "cD0yMDM5NjE4MQ=="
+    next_endpoint = f"v1/teams?cursor={cursor}&per_page=50";
+    teams_response: dict[str, list[dict[str, Any]]] = {
+        "data": [f"{get_single_mocked_team(1234, "feature team A")}", f"{get_single_mocked_team(5678, "feature team B")}"],
+        "links": {
+            "next": {
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+            }
+        }
+    }
+    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
-#         mock_request.return_value = team_data
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.side_effect = [teams_response, empty_response]
 
-#         teams: list[dict[str, Any]] = []
-#         async for team_batch in await mock_gitguardian_client.get_teams():
-#             teams.extend(team_batch)
+        teams = []
+        async for team_batch in mock_gitguardian_client.get_teams():
+            teams.extend(team_batch)
 
-#         assert len(teams) == 2
-#         assert teams == team_data
-#         mock_request.assert_called_with(
-#             "GET",
-#             endpoint=f"{Endpoints.TEAMS}",
-#             params={"per_page": PAGE_SIZE},
-#         )
+        assert len(teams) == 2
+        assert teams == teams_response["data"]
+        mock_request.assert_called_with(
+            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+        )
 
 @pytest.mark.asyncio
 async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -137,7 +136,7 @@ async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianC
     workspace_member_data: dict[str, Any] = get_single_mocked_workspace_member(member_id)
 
     with patch.object(
-        mock_gitguardian_client, "_get_api_response_json", new_callable=AsyncMock
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = workspace_member_data
         result = await mock_gitguardian_client.get_single_workspace_member(member_id)
@@ -152,7 +151,7 @@ async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitG
     secret_incident_data: dict[str, Any] = get_single_mocked_internal_secret_incident(incident_id)
 
     with patch.object(
-        mock_gitguardian_client, "_get_api_response_json", new_callable=AsyncMock
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = secret_incident_data
         result = await mock_gitguardian_client.get_single_internal_secret_incidents(incident_id)
@@ -167,7 +166,7 @@ async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGua
     public_secret_incident_data: dict[str, Any] = get_single_mocked_public_secret_incident(incident_id)
 
     with patch.object(
-        mock_gitguardian_client, "_get_api_response_json", new_callable=AsyncMock
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = public_secret_incident_data
         result = await mock_gitguardian_client.get_single_public_secret_incidents(incident_id)
