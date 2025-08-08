@@ -114,7 +114,7 @@ class GitGuardianClient:
 
     async def get_audit_logs(self) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all audit logs from GitGuardian.")
-        async for audit_logs in self._send_api_request(endpoint=Endpoints.AUDIT_LOGS):
+        async for audit_logs in self._send_paginated_request(endpoint=Endpoints.AUDIT_LOGS):
             yield audit_logs
 
     async def get_custom_tags(self) -> AsyncGenerator[list[dict[str, Any]], None]:

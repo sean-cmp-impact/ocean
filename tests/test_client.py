@@ -72,7 +72,7 @@ async def test_send_api_request_failure(mock_gitguardian_client: GitGuardianClie
 async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_source method"""
     source_id = 123456789
-    source_data: dict[str, Any] = get_single_mocked_source(source_id)
+    source_data: dict[str, Any] = get_single_mocked_source(source_id, "test_repo")
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -82,6 +82,36 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.SOURCES}/{source_id}")
         assert result == source_data
+
+@pytest.mark.asyncio
+async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_sources method"""
+    cursor = "cD0yMDM5NjE4MQ=="
+    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={cursor}&per_page=50";
+    sources_response: dict[str, list[dict[str, Any]]] = {
+        "data": [f"{get_single_mocked_source(1234, "test_repo")}", f"{get_single_mocked_source(5678, "mock_repo")}"],
+        "links": {
+            "next": {
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+            }
+        }
+    }
+    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.side_effect = [sources_response, empty_response]
+
+        sources = []
+        async for source_batch in mock_gitguardian_client.get_sources():
+            sources.extend(source_batch)
+
+        assert len(sources) == 2
+        assert sources == sources_response["data"]
+        mock_request.assert_called_with(
+            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+        )
 
 @pytest.mark.asyncio
 async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -165,12 +195,12 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
     ) as mock_request:
         mock_request.side_effect = [members_response, empty_response]
 
-        teams = []
-        async for team_batch in mock_gitguardian_client.get_workspace_members():
-            teams.extend(team_batch)
+        members = []
+        async for member_batch in mock_gitguardian_client.get_workspace_members():
+            members.extend(member_batch)
 
-        assert len(teams) == 2
-        assert teams == members_response["data"]
+        assert len(members) == 2
+        assert members == members_response["data"]
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
@@ -226,11 +256,11 @@ def get_single_mocked_workspace_member(member_id: int, name: str):
         "last_login": "2025-06-28T16:40:26.897Z"
     }
 
-def get_single_mocked_source(source_id: int):
+def get_single_mocked_source(source_id: int, repo_name: str):
     return {
         "id": source_id,
         "type": "github",
-        "full_name": "TestGitHubOrg/test_repo",
+        "full_name": f"TestGitHubOrg/{repo_name}",
         "health": "at_risk",
         "source_criticality": "unknown",
         "default_branch": "main",
@@ -273,7 +303,7 @@ def get_single_mocked_source(source_id: int):
                 }
             }
         },
-        "url": "https://github.com/TestGitHubOrg/test_repo",
+        "url": f"https://github.com/TestGitHubOrg/{repo_name}",
         "deleted": False
     }
 
