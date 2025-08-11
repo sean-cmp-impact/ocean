@@ -16,29 +16,26 @@ resources:
             health: .health
             sourceCriticality: .source_criticality
             openIncidentsCount: .open_incidents_count
-            openIncidentsSeverityBreakdown:
-              critical: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
-              high: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
-              medium: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
-              low: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
-              info: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
-              unknown: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
+            openIncidentsSeverityBreakdown.critical: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
+            openIncidentsSeverityBreakdown.high: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
+            openIncidentsSeverityBreakdown.medium: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
+            openIncidentsSeverityBreakdown.low: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
+            openIncidentsSeverityBreakdown.info: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
+            openIncidentsSeverityBreakdown.unknown: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
             closedIncidentsCount: .closed_incidents_count
-            closedIncidentsSeverityBreakdown:
-              critical: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
-              high: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
-              medium: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
-              low: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
-              info: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
-              unknown: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
-            lastScan:
-              date: .last_scan.date
-              status: .last_scan.status
-              failingReason: .last_scan.failing_reason
-              commitScanned: .last_scan.commits_scanned
-              duration: .last_scan.duration
-              branchesScanned: .last_scan.branches_scanned
-              progress: .last_scan.progress
+            closedIncidentsSeverityBreakdown.critical: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
+            closedIncidentsSeverityBreakdown.high: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
+            closedIncidentsSeverityBreakdown.medium: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
+            closedIncidentsSeverityBreakdown.low: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
+            closedIncidentsSeverityBreakdown.info: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
+            closedIncidentsSeverityBreakdown.unknown: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
+            lastScan.date: .last_scan.date
+            lastScan.status: .last_scan.status
+            lastScan.failingReason: .last_scan.failing_reason
+            lastScan.commitScanned: .last_scan.commits_scanned
+            lastScan.duration: .last_scan.duration
+            lastScan.branchesScanned: .last_scan.branches_scanned
+            lastScan.progress: .last_scan.progress
             visibility: .visibility
   - kind: secret_detector
     selector:
@@ -76,13 +73,12 @@ resources:
             id: .id
             exposure: "internal"
             date: .date
-            detector:
-              name: .detector.name
-              displayName: .detector.display_name
-              nature: .detector.nature
-              family: .detector.family
-              detectorGroupName: .detector.detector_group_name
-              detectorGroupDisplayName: .detector.detector_group_display_name
+            detector.name: .detector.name
+            detector.displayName: .detector.display_name
+            detector.nature: .detector.nature
+            detector.family: .detector.family
+            detector.detectorGroupName: .detector.detector_group_name
+            detector.detectorGroupDisplayName: .detector.detector_group_display_name
             secretId: .secret_id
             gitguardianUrl: .gitguardian_url
             regression: .regression
@@ -108,13 +104,12 @@ resources:
             id: .id
             exposure: "public"
             date: .date
-            detector:
-              name: .detector.name
-              displayName: .detector.display_name
-              nature: .detector.nature
-              family: .detector.family
-              detectorGroupName: .detector.detector_group_name
-              detectorGroupDisplayName: .detector.detector_group_display_name
+            detector.name: .detector.name
+            detector.displayName: .detector.display_name
+            detector.nature: .detector.nature
+            detector.family: .detector.family
+            detector.detectorGroupName: .detector.detector_group_name
+            detector.detectorGroupDisplayName: .detector.detector_group_display_name
             secretId: .secret_id
             gitguardianUrl: .gitguardian_url
             regression: .regression
