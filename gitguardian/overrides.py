@@ -14,7 +14,7 @@ class GitGuardianSourceSelector(Selector):
         default="*all",
     )
 
-    
+
 class GitGuardianSourceConfig(ResourceConfig):
     selector: GitGuardianSourceSelector
     kind: Literal["source"]
@@ -27,35 +27,35 @@ class GitGuardianSecretDetectorSelector(Selector):
         default="*all",
     )
 
-    
+
 class GitGuardianSecretDetectorConfig(ResourceConfig):
     selector: GitGuardianSecretDetectorSelector
     kind: Literal["secret_detector"]
 
 
-class InternalSecretIncidentSelector(Selector):
+class GitGuardianInternalSecretIncidentSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
         default="*all",
     )
-    
 
-class InternalSecretIncidentConfig(ResourceConfig):
-    selector: InternalSecretIncidentSelector
+
+class GitGuardianInternalSecretIncidentConfig(ResourceConfig):
+    selector: GitGuardianInternalSecretIncidentSelector
     kind: Literal["internal_secret_incident"]
 
 
-class PublicSecretIncidentSelector(Selector):
+class GitGuardianPublicSecretIncidentSelector(Selector):
     filter_query: str | None = None
     fields: str | None = Field(
         description="Additional fields to be included in the API response",
         default="*all",
     )
-    
 
-class PublicSecretIncidentConfig(ResourceConfig):
-    selector: PublicSecretIncidentSelector
+
+class GitGuardianPublicSecretIncidentConfig(ResourceConfig):
+    selector: GitGuardianPublicSecretIncidentSelector
     kind: Literal["public_secret_incident"]
 
 
@@ -141,8 +141,8 @@ class GitGuardianPortAppConfig(PortAppConfig):
     resources: list[
         GitGuardianSourceConfig
         | GitGuardianSecretDetectorSelector
-        | InternalSecretIncidentConfig
-        | PublicSecretIncidentConfig
+        | GitGuardianInternalSecretIncidentConfig
+        | GitGuardianPublicSecretIncidentConfig
         | GitGuardianTeamConfig
         | GitGuardianWorkspaceMemberConfig
         | GitGuardianTeamMemberConfig
