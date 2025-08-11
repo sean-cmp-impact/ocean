@@ -254,7 +254,7 @@ async def test_get_internal_secret_incidents(mock_gitguardian_client: GitGuardia
 async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
-    public_secret_incident_data: dict[str, Any] = get_single_mocked_public_secret_incident(incident_id)
+    public_secret_incident_data: dict[str, Any] = get_single_mocked_public_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -273,6 +273,36 @@ def get_single_mocked_team(team_id: int, team_name: str):
         "is_global": False,
         "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/settings/user/teams/1"
     }
+
+@pytest.mark.asyncio
+async def test_get_public_secret_incidents(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_public_secret_incidents method"""
+    cursor = "cD0yMDM5NjE4MQ=="
+    next_endpoint = f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={cursor}&per_page=50";
+    public_incidents_response: dict[str, list[dict[str, Any]]] = {
+        "data": [f"{get_single_mocked_public_secret_incident(1234, "slackbot_token", "Slack Bot Token")}", f"{get_single_mocked_public_secret_incident(5678, "generic_high_entropy_secret", "Generic High Entropy Secret")}"],
+        "links": {
+            "next": {
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+            }
+        }
+    }
+    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
+
+    with patch.object(
+        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+    ) as mock_request:
+        mock_request.side_effect = [public_incidents_response, empty_response]
+
+        public_incidents = []
+        async for public_incident_batch in mock_gitguardian_client.get_internal_secret_incidents():
+            public_incidents.extend(public_incident_batch)
+
+        assert len(public_incidents) == 2
+        assert public_incidents == public_incidents_response["data"]
+        mock_request.assert_called_with(
+            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+        )
 
 def get_single_mocked_workspace_member(member_id: int, name: str):
     return {
@@ -409,16 +439,16 @@ def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: 
         "occurrences": None
     }
 
-def get_single_mocked_public_secret_incident(incident_id: int):
+def get_single_mocked_public_secret_incident(incident_id: int, detector_name: str, detector_display_name):
     return {
         "id": incident_id,
         "detector": {
-            "name": "slack_bot_token",
-            "display_name": "Slack Bot Token",
+            "name": detector_name,
+            "display_name": detector_display_name,
             "nature": "specific",
             "family": "apikey",
-            "detector_group_name": "slackbot_token",
-            "detector_group_display_name": "Slack Bot Token"
+            "detector_group_name": detector_name,
+            "detector_group_display_name": detector_display_name
         },
         "date": "2019-08-22T14:15:22Z",
         "secret_id": 1,
