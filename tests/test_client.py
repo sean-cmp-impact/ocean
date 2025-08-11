@@ -72,7 +72,9 @@ async def test_send_api_request_failure(mock_gitguardian_client: GitGuardianClie
 async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_source method"""
     source_id = 123456789
-    source_data: dict[str, Any] = get_single_mocked_source(source_id, "test_repo")
+    source_data: dict[str, Any] = { 
+        "data": get_single_mocked_source(source_id, "test_repo")
+    }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -81,7 +83,7 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
         result = await mock_gitguardian_client.get_single_source(source_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.SOURCES}/{source_id}")
-        assert result == source_data
+        assert result == source_data["data"]
 
 @pytest.mark.asyncio
 async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -128,7 +130,7 @@ async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> No
         result = await mock_gitguardian_client.get_single_team(team_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
-        assert result == team_data
+        assert result == team_data["data"]
 
 @pytest.mark.asyncio
 async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -164,7 +166,9 @@ async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
 async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_workspace_member method"""
     member_id = 3252
-    workspace_member_data: dict[str, Any] = get_single_mocked_workspace_member(member_id, "John Doe")
+    workspace_member_data: dict[str, Any] = {
+        "data": get_single_mocked_workspace_member(member_id, "John Doe")
+    }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -173,7 +177,7 @@ async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianC
         result = await mock_gitguardian_client.get_single_workspace_member(member_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
-        assert result == workspace_member_data
+        assert result == workspace_member_data["data"]
 
 @pytest.mark.asyncio
 async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -209,7 +213,9 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
 async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
-    secret_incident_data: dict[str, Any] = get_single_mocked_internal_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+    secret_incident_data: dict[str, Any] = {
+        "data": get_single_mocked_internal_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+    }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -218,7 +224,7 @@ async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitG
         result = await mock_gitguardian_client.get_single_internal_secret_incidents(incident_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.INTERNAL_SECRET_INCIDENTS}/{incident_id}")
-        assert result == secret_incident_data
+        assert result == secret_incident_data["data"]
 
 @pytest.mark.asyncio
 async def test_get_internal_secret_incidents(mock_gitguardian_client: GitGuardianClient) -> None:
@@ -254,7 +260,9 @@ async def test_get_internal_secret_incidents(mock_gitguardian_client: GitGuardia
 async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
-    public_secret_incident_data: dict[str, Any] = get_single_mocked_public_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+    public_secret_incident_data: dict[str, Any] = {
+        "data": get_single_mocked_public_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+    }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -263,7 +271,7 @@ async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGua
         result = await mock_gitguardian_client.get_single_public_secret_incidents(incident_id)
 
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}")
-        assert result == public_secret_incident_data
+        assert result == public_secret_incident_data["data"]
 
 def get_single_mocked_team(team_id: int, team_name: str):
     return {
