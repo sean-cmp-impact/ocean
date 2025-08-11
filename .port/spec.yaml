@@ -16,21 +16,26 @@ features:
       - kind: audit_log
       - kind: custom_tag
 configurations:
-  - name: gitGuardianApiBaseUrl
+  - name: gitguardianApiBaseUrl
     required: true
     type: string
     sensitive: false
-    description: The Base URL of the GitGuardian API.
-  - name: gitGuardianApiToken
+    description: The Base URL of the GitGuardian API  
+  - name: gitguardianApiVersion
+    required: true
+    type: string
+    sensitive: false
+    description: The version of the GitGuardian API
+  - name: gitguardianApiToken
     required: true
     type: string
     sensitive: true
-    description: The API token required to auth against the GitGuardian API.
-  - name: gitGuardianApiVersion
+    description: The API token required to auth against the GitGuardian API
+  - name: gitguardianWebhookSecret
     required: true
     type: string
-    sensitive: false
-    description: The version of the GitGuardian API.
+    sensitive: true
+    description: GitGuardian webhook secret (optional). This is used to secure webhook communication between GitGuardian and Port. To learn more, see the <a href="https://docs.gitguardian.com/platform/configure-alerting/notifiers-integrations/custom-webhook" target="_blank">GitGuardian documentation</a>
 saas:
   enabled: true
   liveEvents:
