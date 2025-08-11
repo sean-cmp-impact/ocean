@@ -4,23 +4,11 @@ from initialize_client import init_gitguardian_client
 from port_ocean.context.event import event
 from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
 from integration import ObjectKind
-from webhook_processors.audit_log_webhook_processor import AuditLogWebhookProcessor
-from webhook_processors.custom_tag_webhook_processor import CustomTagWebhookProcessor
-from webhook_processors.developer_webhook_processor import DeveloperWebhookProcessor
 from webhook_processors.internal_incident_webhook_processor import (
     InternalSecretIncidentWebhookProcessor,
 )
 from webhook_processors.public_incident_webhook_processor import (
     PublicSecretIncidentWebhookProcessor,
-)
-from webhook_processors.secret_detector_webhook_processor import (
-    SecretDetectorWebhookProcessor,
-)
-from webhook_processors.source_webhook_processor import SourceWebhookProcessor
-from webhook_processors.team_member_webhook_processor import TeamMemberWebhookProcessor
-from webhook_processors.team_webhook_processor import TeamWebhookProcessor
-from webhook_processors.workspace_member_webhook_processor import (
-    WorkspaceMemberWebhookProcessor,
 )
 
 
@@ -128,13 +116,5 @@ async def on_resync_custom_tags(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
         yield custom_tags
 
 
-ocean.add_webhook_processor("/webhook", SourceWebhookProcessor)
-ocean.add_webhook_processor("/webhook", SecretDetectorWebhookProcessor)
 ocean.add_webhook_processor("/webhook", InternalSecretIncidentWebhookProcessor)
 ocean.add_webhook_processor("/webhook", PublicSecretIncidentWebhookProcessor)
-ocean.add_webhook_processor("/webhook", TeamWebhookProcessor)
-ocean.add_webhook_processor("/webhook", TeamMemberWebhookProcessor)
-ocean.add_webhook_processor("/webhook", WorkspaceMemberWebhookProcessor)
-ocean.add_webhook_processor("/webhook", DeveloperWebhookProcessor)
-ocean.add_webhook_processor("/webhook", AuditLogWebhookProcessor)
-ocean.add_webhook_processor("/webhook", CustomTagWebhookProcessor)

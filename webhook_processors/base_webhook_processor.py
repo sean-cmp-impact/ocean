@@ -7,6 +7,7 @@ from port_ocean.core.handlers.webhook.abstract_webhook_processor import (
     AbstractWebhookProcessor,
 )
 from port_ocean.core.handlers.webhook.webhook_event import EventPayload, WebhookEvent
+from initialize_client import init_gitguardian_client
 
 
 class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
@@ -41,4 +42,8 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         return True
 
     async def validate_payload(self, payload: EventPayload) -> bool:
-        return payload.get("source", "").lower() == "gitguardian"
+        return (
+            payload.get("payload", {}).get("action", "").startswith("incident_")
+            and payload.get("payload", {}).get("custom_webhook_name", "").lower()
+            == "port_gitguardian_webhook"
+        )

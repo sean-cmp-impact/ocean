@@ -1,6 +1,4 @@
-from typing import cast
-from gitguardian.overrides import GitGuardianInternalSecretIncidentConfig
-from initialize_client import init_gitguardian_client
+from loguru import logger
 from port_ocean.core.handlers.port_app_config.models import ResourceConfig
 from port_ocean.core.handlers.webhook.webhook_event import (
     EventPayload,
@@ -8,6 +6,7 @@ from port_ocean.core.handlers.webhook.webhook_event import (
     WebhookEventRawResults,
 )
 
+from initialize_client import init_gitguardian_client
 from integration import ObjectKind
 from webhook_processors.base_webhook_processor import BaseGitGuardianWebhookProcessor
 
@@ -19,7 +18,35 @@ class InternalSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
     async def handle_event(
         self, payload: EventPayload, resource_config: ResourceConfig
     ) -> WebhookEventRawResults:
-        client = init_gitguardian_client()
-        config = cast(GitGuardianInternalSecretIncidentConfig, resource_config)
+        webhook_event_type = payload.get("payload", {}).get("action")
 
-        # TODO: Add logic for handling event
+        if not webhook_event_type.startswith("incident_"):
+            return empty_response("Attempted to handle incorrect webhook event type.")
+
+        incident_id = payload.get("payload", {}).get("incident", {}).get("id")
+
+        if incident_id is None:
+            return empty_response("Failed to retrieve an incident ID from the payload.")
+
+        logger.debug(f"Fetching incident with ID: {incident_id}")
+        client = await init_gitguardian_client()
+        incident_data = await client.get_single_internal_secret_incidents(incident_id)
+
+        if incident_data is None:
+            return empty_response(
+                f"Failed to retrieve an incident with ID: {incident_id}"
+            )
+
+        logger.info(f"Processing incident: {incident_id}")
+        return WebhookEventRawResults(
+            updated_raw_results=[incident_data],
+            deleted_raw_results=[],
+        )
+
+
+async def empty_response(log_message: str) -> WebhookEventRawResults:
+    logger.warning(log_message)
+    return WebhookEventRawResults(
+        updated_raw_results=[],
+        deleted_raw_results=[],
+    )
