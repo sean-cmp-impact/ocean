@@ -18,13 +18,6 @@ class PublicSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
     async def handle_event(
         self, payload: EventPayload, resource_config: ResourceConfig
     ) -> WebhookEventRawResults:
-        webhook_event_type = payload.get("payload", {}).get("action")
-
-        if not webhook_event_type.endswith("_publicly"):
-            return self._empty_response(
-                f"Attempted to handle incorrect webhook event type: {webhook_event_type}"
-            )
-
         incident_id = payload.get("payload", {}).get("incident", {}).get("id")
 
         if incident_id is None:
@@ -43,6 +36,7 @@ class PublicSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
 
         data_to_update = []
         data_to_delete = []
+        webhook_event_type = payload.get("payload", {}).get("action")
         logger.info(f"Processing public incident: {incident_id}")
 
         if webhook_event_type == "incident_unshared_publicly":
