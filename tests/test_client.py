@@ -7,6 +7,10 @@ from gitguardian.client import PAGE_SIZE, Endpoints, GitGuardianClient
 from httpx import HTTPStatusError, Request, Response
 
 
+cursor = "ABCDEF"
+empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
+
+
 @pytest.fixture(autouse=True)
 def mock_ocean_context() -> None:
     """Fixture to mock the Ocean context initialization."""
@@ -17,7 +21,7 @@ def mock_ocean_context() -> None:
         mock_ocean_app.config.integration.config = {
             "gitguardian_api_base_url": "https://mockapi.gitguardian.com",
             "gitguardian_api_token": "test_api_key",
-            "gitguardian_api_version": "v1"
+            "gitguardian_api_version": "v1",
         }
         mock_ocean_app.integration_router = MagicMock()
         mock_ocean_app.port_client = MagicMock()
@@ -28,6 +32,7 @@ def mock_ocean_context() -> None:
     except PortOceanContextAlreadyInitializedError:
         pass
 
+
 @pytest.fixture
 def mock_gitguardian_client() -> GitGuardianClient:
     """Fixture to initialize GitGuardianClient with mock parameters."""
@@ -37,15 +42,21 @@ def mock_gitguardian_client() -> GitGuardianClient:
         api_version="v1",
     )
 
+
 @pytest.mark.asyncio
-async def test_client_initialization(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_client_initialization(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test the correct initialization of GitGuardianClient."""
     assert mock_gitguardian_client.base_url == "https://mockapi.gitguardian.com"
     assert mock_gitguardian_client.api_key == "test_api_key"
     assert mock_gitguardian_client.api_version == "v1"
 
+
 @pytest.mark.asyncio
-async def test_send_api_request_success(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_send_api_request_success(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test successful API requests."""
     with patch.object(
         mock_gitguardian_client.http_client, "request", new_callable=AsyncMock
@@ -53,26 +64,32 @@ async def test_send_api_request_success(mock_gitguardian_client: GitGuardianClie
         mock_request.return_value = Response(
             200, request=Request("GET", "/some_endpoint"), json={"key": "value"}
         )
-        response = await mock_gitguardian_client._send_api_request("GET", "/some_endpoint")
+        response = await mock_gitguardian_client._send_api_request(
+            "GET", "/some_endpoint"
+        )
         assert response["data"]["key"] == "value"
 
+
 @pytest.mark.asyncio
-async def test_send_api_request_failure(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_send_api_request_failure(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test API request raising exceptions."""
     with patch.object(
         mock_gitguardian_client.http_client, "request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = Response(
             500, request=Request("GET", "/some_endpoint")
-        )        
+        )
         with pytest.raises(HTTPStatusError):
             await mock_gitguardian_client._send_api_request("GET", "/some_endpoint")
+
 
 @pytest.mark.asyncio
 async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_source method"""
     source_id = 123456789
-    source_data: dict[str, Any] = { 
+    source_data: dict[str, Any] = {
         "data": get_single_mocked_source(source_id, "test_repo")
     }
 
@@ -82,23 +99,28 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
         mock_request.return_value = source_data
         result = await mock_gitguardian_client.get_single_source(source_id)
 
-        mock_request.assert_called_once_with(endpoint=f"{Endpoints.SOURCES}/{source_id}")
+        mock_request.assert_called_once_with(
+            endpoint=f"{Endpoints.SOURCES}/{source_id}"
+        )
         assert result == source_data["data"]
+
 
 @pytest.mark.asyncio
 async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_sources method"""
-    cursor = "cD0yMDM5NjE4MQ=="
-    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={cursor}&per_page=50";
+    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={cursor}&per_page=50"
     sources_response: dict[str, list[dict[str, Any]]] = {
-        "data": [f"{get_single_mocked_source(1234, "test_repo")}", f"{get_single_mocked_source(5678, "mock_repo")}"],
+        "data": [
+            f"{get_single_mocked_source(1234, "test_repo")}",
+            f"{get_single_mocked_source(5678, "mock_repo")}",
+        ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "rel": "next",
             }
-        }
+        },
     }
-    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -112,14 +134,17 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
         assert len(sources) == 2
         assert sources == sources_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            endpoint=f"/{next_endpoint}",
+            method="GET",
+            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
+
 
 @pytest.mark.asyncio
 async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_single_team method"""
     team_id = 1313
-    team_data: dict[str, Any] = { 
+    team_data: dict[str, Any] = {
         "data": get_single_mocked_team(team_id, "feature team A")
     }
 
@@ -132,20 +157,23 @@ async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> No
         mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
         assert result == team_data["data"]
 
+
 @pytest.mark.asyncio
 async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_teams method"""
-    cursor = "cD0yMDM5NjE4MQ=="
-    next_endpoint = f"v1/{Endpoints.TEAMS}?cursor={cursor}&per_page=50";
+    next_endpoint = f"v1/{Endpoints.TEAMS}?cursor={cursor}&per_page=50"
     teams_response: dict[str, list[dict[str, Any]]] = {
-        "data": [f"{get_single_mocked_team(1234, "feature team A")}", f"{get_single_mocked_team(5678, "feature team B")}"],
+        "data": [
+            f"{get_single_mocked_team(1234, "feature team A")}",
+            f"{get_single_mocked_team(5678, "feature team B")}",
+        ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "rel": "next",
             }
-        }
+        },
     }
-    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -159,11 +187,16 @@ async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
         assert len(teams) == 2
         assert teams == teams_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            endpoint=f"/{next_endpoint}",
+            method="GET",
+            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
 
+
 @pytest.mark.asyncio
-async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_get_single_workspace_member(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test get_single_workspace_member method"""
     member_id = 3252
     workspace_member_data: dict[str, Any] = {
@@ -176,23 +209,28 @@ async def test_get_single_workspace_member(mock_gitguardian_client: GitGuardianC
         mock_request.return_value = workspace_member_data
         result = await mock_gitguardian_client.get_single_workspace_member(member_id)
 
-        mock_request.assert_called_once_with(endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}")
+        mock_request.assert_called_once_with(
+            endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}"
+        )
         assert result == workspace_member_data["data"]
+
 
 @pytest.mark.asyncio
 async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test workspace_members method"""
-    cursor = "cD0yMDM5NjE4MQ=="
-    next_endpoint = f"v1/{Endpoints.WORKSPACE_MEMBERS}?cursor={cursor}&per_page=50";
+    next_endpoint = f"v1/{Endpoints.WORKSPACE_MEMBERS}?cursor={cursor}&per_page=50"
     members_response: dict[str, list[dict[str, Any]]] = {
-        "data": [f"{get_single_mocked_workspace_member(1234, "John Doe")}", f"{get_single_mocked_workspace_member(5678, "Jane Doe")}"],
+        "data": [
+            f"{get_single_mocked_workspace_member(1234, "John Doe")}",
+            f"{get_single_mocked_workspace_member(5678, "Jane Doe")}",
+        ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "rel": "next",
             }
-        }
+        },
     }
-    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -206,40 +244,58 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
         assert len(members) == 2
         assert members == members_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            endpoint=f"/{next_endpoint}",
+            method="GET",
+            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
 
+
 @pytest.mark.asyncio
-async def test_get_single_internal_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_get_single_internal_secret_incident(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
     secret_incident_data: dict[str, Any] = {
-        "data": get_single_mocked_internal_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+        "data": get_single_mocked_internal_secret_incident(
+            incident_id, "slackbot_token", "Slack Bot Token"
+        )
     }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = secret_incident_data
-        result = await mock_gitguardian_client.get_single_internal_secret_incidents(incident_id)
+        result = await mock_gitguardian_client.get_single_internal_secret_incidents(
+            incident_id
+        )
 
-        mock_request.assert_called_once_with(endpoint=f"{Endpoints.INTERNAL_SECRET_INCIDENTS}/{incident_id}")
+        mock_request.assert_called_once_with(
+            endpoint=f"{Endpoints.INTERNAL_SECRET_INCIDENTS}/{incident_id}"
+        )
         assert result == secret_incident_data["data"]
 
+
 @pytest.mark.asyncio
-async def test_get_internal_secret_incidents(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_get_internal_secret_incidents(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test get_internal_secret_incidents method"""
-    cursor = "cD0yMDM5NjE4MQ=="
-    next_endpoint = f"v1/{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={cursor}&per_page=50";
+    next_endpoint = (
+        f"v1/{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={cursor}&per_page=50"
+    )
     internal_incidents_response: dict[str, list[dict[str, Any]]] = {
-        "data": [f"{get_single_mocked_internal_secret_incident(1234, "slackbot_token", "Slack Bot Token")}", f"{get_single_mocked_internal_secret_incident(5678, "generic_high_entropy_secret", "Generic High Entropy Secret")}"],
+        "data": [
+            f"{get_single_mocked_internal_secret_incident(1234, "slackbot_token", "Slack Bot Token")}",
+            f"{get_single_mocked_internal_secret_incident(5678, "generic_high_entropy_secret", "Generic High Entropy Secret")}",
+        ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "rel": "next",
             }
-        }
+        },
     }
-    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -247,31 +303,45 @@ async def test_get_internal_secret_incidents(mock_gitguardian_client: GitGuardia
         mock_request.side_effect = [internal_incidents_response, empty_response]
 
         internal_incidents = []
-        async for internal_incident_batch in mock_gitguardian_client.get_internal_secret_incidents():
+        async for (
+            internal_incident_batch
+        ) in mock_gitguardian_client.get_internal_secret_incidents():
             internal_incidents.extend(internal_incident_batch)
 
         assert len(internal_incidents) == 2
         assert internal_incidents == internal_incidents_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            endpoint=f"/{next_endpoint}",
+            method="GET",
+            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
 
+
 @pytest.mark.asyncio
-async def test_get_single_public_secret_incident(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_get_single_public_secret_incident(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test get_single_internal_secret_incident method"""
     incident_id = 3970
     public_secret_incident_data: dict[str, Any] = {
-        "data": get_single_mocked_public_secret_incident(incident_id, "slackbot_token", "Slack Bot Token")
+        "data": get_single_mocked_public_secret_incident(
+            incident_id, "slackbot_token", "Slack Bot Token"
+        )
     }
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
         mock_request.return_value = public_secret_incident_data
-        result = await mock_gitguardian_client.get_single_public_secret_incidents(incident_id)
+        result = await mock_gitguardian_client.get_single_public_secret_incidents(
+            incident_id
+        )
 
-        mock_request.assert_called_once_with(endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}")
+        mock_request.assert_called_once_with(
+            endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}"
+        )
         assert result == public_secret_incident_data["data"]
+
 
 def get_single_mocked_team(team_id: int, team_name: str):
     return {
@@ -279,23 +349,30 @@ def get_single_mocked_team(team_id: int, team_name: str):
         "name": team_name,
         "description": "Description of my team",
         "is_global": False,
-        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/settings/user/teams/1"
+        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/settings/user/teams/1",
     }
 
+
 @pytest.mark.asyncio
-async def test_get_public_secret_incidents(mock_gitguardian_client: GitGuardianClient) -> None:
+async def test_get_public_secret_incidents(
+    mock_gitguardian_client: GitGuardianClient,
+) -> None:
     """Test get_public_secret_incidents method"""
-    cursor = "cD0yMDM5NjE4MQ=="
-    next_endpoint = f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={cursor}&per_page=50";
+    next_endpoint = (
+        f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={cursor}&per_page=50"
+    )
     public_incidents_response: dict[str, list[dict[str, Any]]] = {
-        "data": [f"{get_single_mocked_public_secret_incident(1234, "slackbot_token", "Slack Bot Token")}", f"{get_single_mocked_public_secret_incident(5678, "generic_high_entropy_secret", "Generic High Entropy Secret")}"],
+        "data": [
+            f"{get_single_mocked_public_secret_incident(1234, "slackbot_token", "Slack Bot Token")}",
+            f"{get_single_mocked_public_secret_incident(5678, "generic_high_entropy_secret", "Generic High Entropy Secret")}",
+        ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}", "rel": "next"
+                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "rel": "next",
             }
-        }
+        },
     }
-    empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
@@ -303,14 +380,19 @@ async def test_get_public_secret_incidents(mock_gitguardian_client: GitGuardianC
         mock_request.side_effect = [public_incidents_response, empty_response]
 
         public_incidents = []
-        async for public_incident_batch in mock_gitguardian_client.get_internal_secret_incidents():
+        async for (
+            public_incident_batch
+        ) in mock_gitguardian_client.get_internal_secret_incidents():
             public_incidents.extend(public_incident_batch)
 
         assert len(public_incidents) == 2
         assert public_incidents == public_incidents_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}", method="GET", query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            endpoint=f"/{next_endpoint}",
+            method="GET",
+            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
         )
+
 
 def get_single_mocked_workspace_member(member_id: int, name: str):
     return {
@@ -321,8 +403,9 @@ def get_single_mocked_workspace_member(member_id: int, name: str):
         "access_level": "owner",
         "active": True,
         "created_at": "2025-06-28T16:40:26.897Z",
-        "last_login": "2025-06-28T16:40:26.897Z"
+        "last_login": "2025-06-28T16:40:26.897Z",
     }
+
 
 def get_single_mocked_source(source_id: int, repo_name: str):
     return {
@@ -342,7 +425,7 @@ def get_single_mocked_source(source_id: int, repo_name: str):
             "commits_scanned": 1,
             "duration": "17.097056",
             "branches_scanned": 1,
-            "progress": 100
+            "progress": 100,
         },
         "monitored": True,
         "visibility": "private",
@@ -356,8 +439,8 @@ def get_single_mocked_source(source_id: int, repo_name: str):
                     "medium": 0,
                     "low": 0,
                     "info": 0,
-                    "unknown": 6
-                }
+                    "unknown": 6,
+                },
             },
             "closed_secret_incidents": {
                 "total": 70,
@@ -367,15 +450,18 @@ def get_single_mocked_source(source_id: int, repo_name: str):
                     "medium": 0,
                     "low": 0,
                     "info": 0,
-                    "unknown": 33
-                }
-            }
+                    "unknown": 33,
+                },
+            },
         },
         "url": f"https://github.com/TestGitHubOrg/{repo_name}",
-        "deleted": False
+        "deleted": False,
     }
 
-def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: str, detector_display_name):
+
+def get_single_mocked_internal_secret_incident(
+    incident_id: int, detector_name: str, detector_display_name
+):
     return {
         "id": incident_id,
         "date": "2019-08-22T14:15:22Z",
@@ -385,7 +471,7 @@ def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: 
             "nature": "specific",
             "family": "apikey",
             "detector_group_name": detector_name,
-            "detector_group_display_name": detector_display_name
+            "detector_group_display_name": detector_display_name,
         },
         "secret_id": 1,
         "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw/juCISuOMgPzYhV28m6OG24",
@@ -403,7 +489,7 @@ def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: 
             "outside_vcs": 1,
             "removed_outside_vcs": 0,
             "in_vcs": 3,
-            "removed_in_vcs": 0
+            "removed_in_vcs": 0,
         },
         "ignore_reason": "test_credential",
         "triggered_at": "2019-05-12T09:37:49Z",
@@ -417,15 +503,12 @@ def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: 
         "validity": "valid",
         "resolved_at": None,
         "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-1111-1111-1111-111111111111",
-        "tags": [
-            "FROM_HISTORICAL_SCAN",
-            "SENSITIVE_FILE"
-        ],
+        "tags": ["FROM_HISTORICAL_SCAN", "SENSITIVE_FILE"],
         "custom_tags": [
             {
                 "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
                 "key": "env",
-                "value": "prod"
+                "value": "prod",
             }
         ],
         "feedback_list": [
@@ -439,15 +522,18 @@ def get_single_mocked_internal_secret_incident(incident_id: int, detector_name: 
                         "type": "boolean",
                         "field_ref": "actual_secret_yes_no",
                         "field_label": "Is it an actual secret?",
-                        "boolean": True
+                        "boolean": True,
                     }
-                ]
+                ],
             }
         ],
-        "occurrences": None
+        "occurrences": None,
     }
 
-def get_single_mocked_public_secret_incident(incident_id: int, detector_name: str, detector_display_name):
+
+def get_single_mocked_public_secret_incident(
+    incident_id: int, detector_name: str, detector_display_name
+):
     return {
         "id": incident_id,
         "detector": {
@@ -456,7 +542,7 @@ def get_single_mocked_public_secret_incident(incident_id: int, detector_name: st
             "nature": "specific",
             "family": "apikey",
             "detector_group_name": detector_name,
-            "detector_group_display_name": detector_display_name
+            "detector_group_display_name": detector_display_name,
         },
         "date": "2019-08-22T14:15:22Z",
         "secret_id": 1,
@@ -489,23 +575,20 @@ def get_single_mocked_public_secret_incident(incident_id: int, detector_name: st
                         "type": "boolean",
                         "field_ref": "actual_secret_yes_no",
                         "field_label": "Is it an actual secret?",
-                        "boolean": True
+                        "boolean": True,
                     }
-                ]
+                ],
             }
         ],
         "declarative_secret_status": "revoked",
         "resolve_reason": "string",
         "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/public-incidents/3899",
-        "tags": [
-            "FROM_HISTORICAL_SCAN",
-            "INTERNALLY_LEAKED"
-        ],
+        "tags": ["FROM_HISTORICAL_SCAN", "INTERNALLY_LEAKED"],
         "custom_tags": [
             {
                 "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
                 "key": "env",
-                "value": "prod"
+                "value": "prod",
             }
-        ]
+        ],
     }
