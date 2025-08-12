@@ -21,19 +21,23 @@ class InternalSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
         webhook_event_type = payload.get("payload", {}).get("action")
 
         if not webhook_event_type.startswith("incident_"):
-            return empty_response("Attempted to handle incorrect webhook event type.")
+            return self._empty_response(
+                f"Attempted to handle incorrect webhook event type: {webhook_event_type}"
+            )
 
         incident_id = payload.get("payload", {}).get("incident", {}).get("id")
 
         if incident_id is None:
-            return empty_response("Failed to retrieve an incident ID from the payload.")
+            return self._empty_response(
+                "Failed to retrieve an incident ID from the payload."
+            )
 
         logger.debug(f"Fetching incident with ID: {incident_id}")
         client = await init_gitguardian_client()
         incident_data = await client.get_single_internal_secret_incidents(incident_id)
 
         if incident_data is None:
-            return empty_response(
+            return self._empty_response(
                 f"Failed to retrieve an incident with ID: {incident_id}"
             )
 
@@ -43,10 +47,5 @@ class InternalSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
             deleted_raw_results=[],
         )
 
-
-async def empty_response(log_message: str) -> WebhookEventRawResults:
-    logger.warning(log_message)
-    return WebhookEventRawResults(
-        updated_raw_results=[],
-        deleted_raw_results=[],
-    )
+    async def validate_payload(self, payload: EventPayload) -> bool:
+        return payload.get("payload", {}).get("action", "").startswith("incident_")

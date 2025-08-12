@@ -6,8 +6,11 @@ from port_ocean.context.ocean import ocean
 from port_ocean.core.handlers.webhook.abstract_webhook_processor import (
     AbstractWebhookProcessor,
 )
-from port_ocean.core.handlers.webhook.webhook_event import EventPayload, WebhookEvent
-from initialize_client import init_gitguardian_client
+from port_ocean.core.handlers.webhook.webhook_event import (
+    EventPayload,
+    WebhookEvent,
+    WebhookEventRawResults,
+)
 
 
 class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
@@ -16,8 +19,13 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
             return False
 
         # See https://docs.gitguardian.com/platform/configure-alerting/notifiers-integrations/custom-webhook
-        webhook_secret = ocean.integration_config.get("webhook_secret")
         signature = event.headers.get("gitguardian-signature", "")
+
+        if not signature.startswith("sha256="):
+            return False
+
+        signature = signature.split("sha256=")[-1]
+        webhook_secret = ocean.integration_config.get("webhook_secret")
         timestamp = event.headers.get("timestamp", "")
 
         if signature and not webhook_secret:
@@ -41,9 +49,9 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
     ) -> bool:
         return True
 
-    async def validate_payload(self, payload: EventPayload) -> bool:
-        return (
-            payload.get("payload", {}).get("action", "").startswith("incident_")
-            and payload.get("payload", {}).get("custom_webhook_name", "").lower()
-            == "port_gitguardian_webhook"
+    async def _empty_response(log_message: str) -> WebhookEventRawResults:
+        logger.warning(log_message)
+        return WebhookEventRawResults(
+            updated_raw_results=[],
+            deleted_raw_results=[],
         )
