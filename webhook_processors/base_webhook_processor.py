@@ -18,6 +18,9 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         if event._original_request is None:
             return False
 
+        return await self._verify_payload_signature(event)
+
+    async def _verify_payload_signature(self, event: WebhookEvent) -> bool:
         # See https://docs.gitguardian.com/platform/configure-alerting/notifiers-integrations/custom-webhook
         signature = event.headers.get("gitguardian-signature", "")
 
@@ -47,7 +50,15 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
     async def authenticate(
         self, payload: EventPayload, headers: dict[str, Any]
     ) -> bool:
-        return True
+        # Only basic checks are done here. The payload signature verification is done in should_process_event.
+        # See https://ocean.port.io/developing-an-integration/implementing-webhooks/
+        webhook_secret_configured = (
+            ocean.integration_config.get("webhook_secret") is not None
+        )
+        has_required_headers = (
+            "gitguardian-signature" in headers and "timestamp" in headers
+        )
+        return webhook_secret_configured and has_required_headers
 
     async def _empty_response(log_message: str) -> WebhookEventRawResults:
         logger.warning(log_message)
