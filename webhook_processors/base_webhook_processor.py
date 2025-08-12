@@ -40,7 +40,7 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         # Verify signature if webhook secret configured
         body = await event._original_request.body()
         computed_signature = hmac.new(
-            (timestamp + webhook_secret).encode("utf-8"),
+            bytes(timestamp + webhook_secret, "utf-8"),
             body,
             hashlib.sha256,
         ).hexdigest()
