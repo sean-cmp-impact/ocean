@@ -35,7 +35,7 @@ def mock_context(monkeypatch: Any) -> MagicMock:
 
 
 class BaseWebhookProcessorTest(ABC):
-    """For base functionality only. Polomorphic tests originates from concrete classes"""
+    """For base functionality only. Polomorphic tests originate from concrete classes"""
 
     # This line prevents pytest from collecting tests in this base class
     __test__ = False
