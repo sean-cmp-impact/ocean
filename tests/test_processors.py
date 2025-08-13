@@ -1,17 +1,23 @@
-from typing import Any
-from unittest.mock import AsyncMock, patch
-from port_ocean.context.ocean import PortOceanContext
+import hmac
+import json
+import time
 import pytest
-from port_ocean.core.handlers.webhook.webhook_event import WebhookEvent
+import hashlib
+from typing import Any
 from integration import ObjectKind
-
-# with patch("initialize_client.init_gitguardian_client"):
+from unittest.mock import AsyncMock, MagicMock
+from port_ocean.context.ocean import PortOceanContext
+from port_ocean.core.handlers.webhook.webhook_event import WebhookEvent
 from webhook_processors.internal_incident_webhook_processor import (
     InternalSecretIncidentWebhookProcessor,
 )
 from webhook_processors.public_incident_webhook_processor import (
     PublicSecretIncidentWebhookProcessor,
 )
+
+
+WEBHOOK_SECRET = "testsecret"
+TIMESTAMP = str(time.time())
 
 
 @pytest.fixture
@@ -39,8 +45,8 @@ def resource_config() -> Any:
 
 
 @pytest.fixture
-def mock_context(monkeypatch: Any) -> PortOceanContext:
-    mock_context = AsyncMock()
+def mock_context(monkeypatch: Any) -> MagicMock:
+    mock_context = MagicMock()
     monkeypatch.setattr(PortOceanContext, "app", mock_context)
     return mock_context
 
@@ -50,26 +56,64 @@ async def test_should_process_event_valid_signature_and_timestamp(
     internal_incident_processor: InternalSecretIncidentWebhookProcessor,
     mock_context: PortOceanContext,
 ) -> None:
-    with patch("webhook_processors.base_webhook_processor.hmac") as mock_hmac:
-        mock_hmac_obj = mock_hmac.new.return_value
-        mock_hmac_obj.hexdigest.return_value = "1234567890"
+    set_integration_config(mock_context)
 
-        mock_request = AsyncMock()
-        mock_request.body.return_value = b'{"event":"project.created"}'
+    payload = {"action": "incident_triggered"}
+    body = json.dumps(payload).encode("utf-8")
+    signature = build_signature(body, "sha256")
+    event = init_event(body, signature)
 
-        event = WebhookEvent(
-            trace_id="test-trace-id",
-            payload={
-                "event": "project.created",
-            },
-            headers={
-                "gitguardian-signature": "sha256=1234567890",
-                "timestamp": "0",
-            },
-        )
-        event._original_request = mock_request
+    result = await internal_incident_processor.should_process_event(event)
+    assert result is True
 
-        assert await internal_incident_processor.should_process_event(event) is True
 
-        mock_hmac_obj.hexdigest.return_value = "1"
-        assert await internal_incident_processor.should_process_event(event) is False
+@pytest.mark.asyncio
+async def test_should_process_event_invalid_signature(
+    internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+    mock_context: PortOceanContext,
+) -> None:
+    set_integration_config(mock_context)
+
+    payload = {"action": "incident_triggered"}
+    body = json.dumps(payload).encode("utf-8")
+    signature = "sha256=invalidsignature"
+    event = init_event(body, signature)
+
+    result = await internal_incident_processor.should_process_event(event)
+    assert result is False
+
+
+@pytest.mark.asyncio
+async def test_should_process_event_with_unsupported_hash(
+    internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+    mock_context: PortOceanContext,
+) -> None:
+    set_integration_config(mock_context)
+
+    payload = {"action": "incident_triggered"}
+    body = json.dumps(payload).encode("utf-8")
+    signature = build_signature(body, "md5")
+    event = init_event(body, signature)
+
+    result = await internal_incident_processor.should_process_event(event)
+    assert result is False
+
+
+def build_signature(body, hash_algorithm):
+    return f"{hash_algorithm}={hmac.new(
+        bytes(TIMESTAMP + WEBHOOK_SECRET, "utf-8"), body, hashlib.sha256
+    ).hexdigest()}"
+
+
+def init_event(body, signature):
+    event = MagicMock()
+    event._original_request = MagicMock()
+    event._original_request.body = AsyncMock(return_value=body)
+    event.headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
+    return event
+
+
+def set_integration_config(mock_context) -> None:
+    mock_config = MagicMock()
+    mock_config.integration.config = {"webhook_secret": WEBHOOK_SECRET}
+    mock_context.config = mock_config
