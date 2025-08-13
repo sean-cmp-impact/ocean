@@ -60,7 +60,7 @@ def mock_context(monkeypatch: Any) -> MagicMock:
     return mock_context
 
 
-class TestBaseWebhookProcessor(ABC):
+class BaseWebhookProcessorTest(ABC):
     """For base functionality only. Polomorphic tests originates from concrete classes"""
 
     # This line prevents pytest from collecting tests in this base class
@@ -71,7 +71,7 @@ class TestBaseWebhookProcessor(ABC):
         base_processor: BaseGitGuardianWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        self._set_integration_config(mock_context)
+        self._set_webhook_secret(mock_context)
 
         payload = {"action": "incident_triggered"}
         body = json.dumps(payload).encode("utf-8")
@@ -81,13 +81,12 @@ class TestBaseWebhookProcessor(ABC):
         result = await base_processor.should_process_event(event)
         assert result is True
 
-    @pytest.mark.asyncio
     async def test_should_process_event_invalid_signature(
         self,
         base_processor: BaseGitGuardianWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        self._set_integration_config(mock_context)
+        self._set_webhook_secret(mock_context)
 
         payload = {"action": "incident_triggered"}
         body = json.dumps(payload).encode("utf-8")
@@ -97,13 +96,12 @@ class TestBaseWebhookProcessor(ABC):
         result = await base_processor.should_process_event(event)
         assert result is False
 
-    @pytest.mark.asyncio
     async def test_should_process_event_with_unsupported_hash(
         self,
         base_processor: BaseGitGuardianWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        self._set_integration_config(mock_context)
+        self._set_webhook_secret(mock_context)
 
         payload = {"action": "incident_triggered"}
         body = json.dumps(payload).encode("utf-8")
@@ -112,6 +110,40 @@ class TestBaseWebhookProcessor(ABC):
 
         result = await base_processor.should_process_event(event)
         assert result is False
+
+    async def test_authenticate_with_expected_config_and_headers(
+        self,
+        base_processor: BaseGitGuardianWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        self._set_webhook_secret(mock_context)
+        payload = {"action": "incident_triggered"}
+        body = json.dumps(payload).encode("utf-8")
+        signature = self._get_signature(body, "sha256")
+        headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
+
+        assert await base_processor.authenticate(payload, headers) is True
+
+    async def test_authenticate_with_expected_config_and_no_headers(
+        self,
+        base_processor: BaseGitGuardianWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        self._set_webhook_secret(mock_context)
+        assert await base_processor.authenticate({}, {}) is False
+
+    async def test_authenticate_with_expected_headers_and_no_config(
+        self,
+        base_processor: BaseGitGuardianWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        self._unset_webhook_secret(mock_context)
+        payload = {"action": "incident_triggered"}
+        body = json.dumps(payload).encode("utf-8")
+        signature = self._get_signature(body, "sha256")
+        headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
+
+        assert await base_processor.authenticate(payload, headers) is False
 
     @abstractmethod
     async def test_get_matching_kinds(
@@ -132,13 +164,21 @@ class TestBaseWebhookProcessor(ABC):
         event.headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
         return event
 
-    def _set_integration_config(self, mock_context: PortOceanContext) -> None:
+    def _set_webhook_secret(self, mock_context: PortOceanContext) -> None:
+        self._set_integration_config(mock_context, {"webhook_secret": WEBHOOK_SECRET})
+
+    def _unset_webhook_secret(self, mock_context: PortOceanContext) -> None:
+        self._set_integration_config(mock_context, {"webhook_secret": None})
+
+    def _set_integration_config(
+        self, mock_context: PortOceanContext, config: dict[str, str]
+    ) -> None:
         mock_config = MagicMock()
-        mock_config.integration.config = {"webhook_secret": WEBHOOK_SECRET}
+        mock_config.integration.config = config
         mock_context.config = mock_config
 
 
-class TestInternalSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
+class TestInternalSecretIncidentWebhookProcessor(BaseWebhookProcessorTest):
     __test__ = True
 
     @pytest.mark.asyncio
@@ -147,7 +187,7 @@ class TestInternalSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         internal_incident_processor: InternalSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_valid_signature_and_timestamp(
+        await super().test_should_process_event_valid_signature_and_timestamp(
             internal_incident_processor, mock_context
         )
 
@@ -157,7 +197,7 @@ class TestInternalSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         internal_incident_processor: InternalSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_invalid_signature(
+        await super().test_should_process_event_invalid_signature(
             internal_incident_processor, mock_context
         )
 
@@ -167,7 +207,37 @@ class TestInternalSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         internal_incident_processor: InternalSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_with_unsupported_hash(
+        await super().test_should_process_event_with_unsupported_hash(
+            internal_incident_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_config_and_headers(
+        self,
+        internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_config_and_headers(
+            internal_incident_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_config_and_no_headers(
+        self,
+        internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_config_and_no_headers(
+            internal_incident_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_headers_and_no_config(
+        self,
+        internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_headers_and_no_config(
             internal_incident_processor, mock_context
         )
 
@@ -181,7 +251,7 @@ class TestInternalSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         assert result == [ObjectKind.INTERNAL_SECRET_INCIDENT]
 
 
-class TestPublicSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
+class TestPublicSecretIncidentWebhookProcessor(BaseWebhookProcessorTest):
     __test__ = True
 
     @pytest.mark.asyncio
@@ -190,7 +260,7 @@ class TestPublicSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_valid_signature_and_timestamp(
+        await super().test_should_process_event_valid_signature_and_timestamp(
             public_incident_webhook_processor, mock_context
         )
 
@@ -200,7 +270,7 @@ class TestPublicSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_invalid_signature(
+        await super().test_should_process_event_invalid_signature(
             public_incident_webhook_processor, mock_context
         )
 
@@ -210,7 +280,37 @@ class TestPublicSecretIncidentWebhookProcessor(TestBaseWebhookProcessor):
         public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
         mock_context: PortOceanContext,
     ) -> None:
-        super().test_should_process_event_with_unsupported_hash(
+        await super().test_should_process_event_with_unsupported_hash(
+            public_incident_webhook_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_config_and_headers(
+        self,
+        public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_config_and_headers(
+            public_incident_webhook_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_config_and_no_headers(
+        self,
+        public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_config_and_no_headers(
+            public_incident_webhook_processor, mock_context
+        )
+
+    @pytest.mark.asyncio
+    async def test_authenticate_with_expected_headers_and_no_config(
+        self,
+        public_incident_webhook_processor: PublicSecretIncidentWebhookProcessor,
+        mock_context: PortOceanContext,
+    ) -> None:
+        await super().test_authenticate_with_expected_headers_and_no_config(
             public_incident_webhook_processor, mock_context
         )
 

@@ -7,8 +7,8 @@ from gitguardian.client import PAGE_SIZE, Endpoints, GitGuardianClient
 from httpx import HTTPStatusError, Request, Response
 
 
-cursor = "ABCDEF"
-empty_response: dict[str, list[dict[str, Any]]] = {"data": []}
+CURSOR = "ABCDEF"
+EMPTY_RESPONSE: dict[str, list[dict[str, Any]]] = {"data": []}
 
 
 @pytest.fixture(autouse=True)
@@ -108,7 +108,7 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
 @pytest.mark.asyncio
 async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_sources method"""
-    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={cursor}&per_page=50"
+    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={CURSOR}&per_page=50"
     sources_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_source(1234, "test_repo")}",
@@ -125,7 +125,7 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.side_effect = [sources_response, empty_response]
+        mock_request.side_effect = [sources_response, EMPTY_RESPONSE]
 
         sources = []
         async for source_batch in mock_gitguardian_client.get_sources():
@@ -136,7 +136,7 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}",
             method="GET",
-            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
 
 
@@ -161,7 +161,7 @@ async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> No
 @pytest.mark.asyncio
 async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_teams method"""
-    next_endpoint = f"v1/{Endpoints.TEAMS}?cursor={cursor}&per_page=50"
+    next_endpoint = f"v1/{Endpoints.TEAMS}?cursor={CURSOR}&per_page=50"
     teams_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_team(1234, "feature team A")}",
@@ -178,7 +178,7 @@ async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.side_effect = [teams_response, empty_response]
+        mock_request.side_effect = [teams_response, EMPTY_RESPONSE]
 
         teams = []
         async for team_batch in mock_gitguardian_client.get_teams():
@@ -189,7 +189,7 @@ async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}",
             method="GET",
-            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
 
 
@@ -218,7 +218,7 @@ async def test_get_single_workspace_member(
 @pytest.mark.asyncio
 async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test workspace_members method"""
-    next_endpoint = f"v1/{Endpoints.WORKSPACE_MEMBERS}?cursor={cursor}&per_page=50"
+    next_endpoint = f"v1/{Endpoints.WORKSPACE_MEMBERS}?cursor={CURSOR}&per_page=50"
     members_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_workspace_member(1234, "John Doe")}",
@@ -235,7 +235,7 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.side_effect = [members_response, empty_response]
+        mock_request.side_effect = [members_response, EMPTY_RESPONSE]
 
         members = []
         async for member_batch in mock_gitguardian_client.get_workspace_members():
@@ -246,7 +246,7 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}",
             method="GET",
-            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
 
 
@@ -282,7 +282,7 @@ async def test_get_internal_secret_incidents(
 ) -> None:
     """Test get_internal_secret_incidents method"""
     next_endpoint = (
-        f"v1/{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={cursor}&per_page=50"
+        f"v1/{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
     )
     internal_incidents_response: dict[str, list[dict[str, Any]]] = {
         "data": [
@@ -300,7 +300,7 @@ async def test_get_internal_secret_incidents(
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.side_effect = [internal_incidents_response, empty_response]
+        mock_request.side_effect = [internal_incidents_response, EMPTY_RESPONSE]
 
         internal_incidents = []
         async for (
@@ -313,7 +313,7 @@ async def test_get_internal_secret_incidents(
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}",
             method="GET",
-            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
 
 
@@ -359,7 +359,7 @@ async def test_get_public_secret_incidents(
 ) -> None:
     """Test get_public_secret_incidents method"""
     next_endpoint = (
-        f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={cursor}&per_page=50"
+        f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
     )
     public_incidents_response: dict[str, list[dict[str, Any]]] = {
         "data": [
@@ -377,7 +377,7 @@ async def test_get_public_secret_incidents(
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.side_effect = [public_incidents_response, empty_response]
+        mock_request.side_effect = [public_incidents_response, EMPTY_RESPONSE]
 
         public_incidents = []
         async for (
@@ -390,7 +390,7 @@ async def test_get_public_secret_incidents(
         mock_request.assert_called_with(
             endpoint=f"/{next_endpoint}",
             method="GET",
-            query_params={"cursor": f"{cursor}", "per_page": PAGE_SIZE},
+            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
 
 
