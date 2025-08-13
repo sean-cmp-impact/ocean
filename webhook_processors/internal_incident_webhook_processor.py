@@ -41,4 +41,4 @@ class InternalSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
         )
 
     async def validate_payload(self, payload: EventPayload) -> bool:
-        return payload.get("payload", {}).get("action", "").startswith("incident_")
+        return payload.get("action", "").startswith("incident_")

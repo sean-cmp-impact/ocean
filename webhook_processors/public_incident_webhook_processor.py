@@ -50,4 +50,4 @@ class PublicSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
         )
 
     async def validate_payload(self, payload: EventPayload) -> bool:
-        return payload.get("payload", {}).get("action", "").endswith("_publicly")
+        return payload.get("action", "").endswith("_publicly")
