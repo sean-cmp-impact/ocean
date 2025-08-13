@@ -18,7 +18,7 @@ class InternalSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
     async def handle_event(
         self, payload: EventPayload, resource_config: ResourceConfig
     ) -> WebhookEventRawResults:
-        incident_id = payload.get("payload", {}).get("incident", {}).get("id")
+        incident_id = payload.get("incident", {}).get("id")
 
         if incident_id is None:
             return self._empty_response(

@@ -1,7 +1,22 @@
+from typing import Any
+from unittest.mock import AsyncMock, patch
 import pytest
+from gitguardian.client import GitGuardianClient
 from integration import ObjectKind
+from tests.clients.test_client import get_single_mocked_internal_secret_incident
 from port_ocean.context.ocean import PortOceanContext
-from port_ocean.core.handlers.webhook.webhook_event import WebhookEvent, EventPayload
+from port_ocean.core.handlers.port_app_config.models import (
+    ResourceConfig,
+    Selector,
+    PortResourceConfig,
+    MappingsConfig,
+    EntityMapping,
+)
+from port_ocean.core.handlers.webhook.webhook_event import (
+    WebhookEvent,
+    EventPayload,
+    WebhookEventRawResults,
+)
 from tests.webhook_processors.test_base_webhook_processor import (
     BaseWebhookProcessorTest,
     mock_event,
@@ -17,6 +32,40 @@ def internal_incident_processor(
     mock_event: WebhookEvent,
 ) -> InternalSecretIncidentWebhookProcessor:
     return InternalSecretIncidentWebhookProcessor(mock_event)
+
+
+@pytest.fixture
+def internal_incident_resource_config() -> ResourceConfig:
+    # Create a mock selector with the required generate_request_params method
+    class MockInternalSecretIncidentSelector(Selector):
+        def generate_request_params(self) -> dict[str, Any]:
+            return {}
+
+    return ResourceConfig(
+        kind="internal_secret_incident",
+        selector=MockInternalSecretIncidentSelector(query="test"),
+        port=PortResourceConfig(
+            entity=MappingsConfig(
+                mappings=EntityMapping(
+                    identifier=".id",
+                    title=".name",
+                    blueprint='"gitguardianSecretIncident"',
+                    properties={},
+                    relations={},
+                )
+            )
+        ),
+    )
+
+
+@pytest.fixture
+def mock_gitguardian_client() -> GitGuardianClient:
+    """Fixture to initialize GitGuardianClient with mock parameters."""
+    return GitGuardianClient(
+        base_url="https://mockapi.gitguardian.com",
+        api_key="test_api_key",
+        api_version="v1",
+    )
 
 
 class TestInternalSecretIncidentWebhookProcessor(BaseWebhookProcessorTest):
@@ -111,6 +160,41 @@ class TestInternalSecretIncidentWebhookProcessor(BaseWebhookProcessorTest):
         result = await internal_incident_processor.validate_payload(payload=payload)
 
         assert result is False
+
+    @pytest.mark.asyncio
+    async def test_handle_event(
+        self,
+        internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+        internal_incident_resource_config: ResourceConfig,
+    ) -> None:
+        with patch(
+            "webhook_processors.internal_incident_webhook_processor.init_gitguardian_client"
+        ) as mock_create_client:
+            mock_client = AsyncMock()
+            mock_http_response = get_single_mocked_internal_secret_incident(
+                31450, "generic_password", "Generic Password"
+            )
+            mock_client.get_single_internal_secret_incidents.return_value = (
+                mock_http_response
+            )
+            mock_create_client.return_value = mock_client
+
+            payload = self._get_mocked_assign_event_payload()
+            expected_result = WebhookEventRawResults(
+                updated_raw_results=[mock_http_response],
+                deleted_raw_results=[],
+            )
+
+            actual_result = await internal_incident_processor.handle_event(
+                payload=payload, resource_config=internal_incident_resource_config
+            )
+
+            assert (
+                actual_result.updated_raw_results == expected_result.updated_raw_results
+            )
+            assert (
+                actual_result.deleted_raw_results == expected_result.deleted_raw_results
+            )
 
     def _get_mocked_assign_event_payload(self) -> EventPayload:
         return {

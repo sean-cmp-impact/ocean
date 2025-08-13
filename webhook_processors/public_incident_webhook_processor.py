@@ -18,7 +18,7 @@ class PublicSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
     async def handle_event(
         self, payload: EventPayload, resource_config: ResourceConfig
     ) -> WebhookEventRawResults:
-        incident_id = payload.get("payload", {}).get("incident", {}).get("id")
+        incident_id = payload.get("incident", {}).get("id")
 
         if incident_id is None:
             return self._empty_response(
@@ -34,20 +34,19 @@ class PublicSecretIncidentWebhookProcessor(BaseGitGuardianWebhookProcessor):
                 f"Failed to retrieve a public incident with ID: {incident_id}"
             )
 
-        data_to_update = []
-        data_to_delete = []
-        webhook_event_type = payload.get("payload", {}).get("action")
+        webhook_event_type = payload.get("action")
         logger.info(f"Processing public incident: {incident_id}")
 
         if webhook_event_type == "incident_unshared_publicly":
-            data_to_delete.extend([incident_data])
+            return WebhookEventRawResults(
+                updated_raw_results=[],
+                deleted_raw_results=[incident_data],
+            )
         else:
-            data_to_update.extend([incident_data])
-
-        return WebhookEventRawResults(
-            updated_raw_results=data_to_update,
-            deleted_raw_results=data_to_delete,
-        )
+            return WebhookEventRawResults(
+                updated_raw_results=[incident_data],
+                deleted_raw_results=[],
+            )
 
     async def validate_payload(self, payload: EventPayload) -> bool:
         return payload.get("action", "").endswith("_publicly")
