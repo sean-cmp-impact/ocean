@@ -141,10 +141,8 @@ class GitGuardianAuditLogConfig(ResourceConfig):
 
 
 class GitGuardianCustomTagSelector(Selector):
-    filter_query: str | None = None
-    fields: str | None = Field(
-        description="Additional fields to be included in the API response",
-        default="*all",
+    key: str | None = Field(
+        description="Filter on the specified custom tag key. Example: env",
     )
 
 

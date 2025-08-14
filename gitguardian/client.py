@@ -116,9 +116,13 @@ class GitGuardianClient:
         ):
             yield audit_logs
 
-    async def get_custom_tags(self) -> AsyncGenerator[list[dict[str, Any]], None]:
+    async def get_custom_tags(
+        self, query_params: Optional[dict[str, Any]] = None
+    ) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all existing custom tags from GitGuardian.")
-        async for custom_tags in self._send_api_request(endpoint=Endpoints.CUSTOM_TAGS):
+        async for custom_tags in self._send_api_request(
+            endpoint=Endpoints.CUSTOM_TAGS, query_params=query_params
+        ):
             yield custom_tags
 
     async def get_developers(self) -> AsyncGenerator[list[dict[str, Any]], None]:

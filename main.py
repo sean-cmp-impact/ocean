@@ -1,7 +1,7 @@
-from typing import cast
+from typing import Any, cast
 from loguru import logger
 from port_ocean.context.ocean import ocean
-from gitguardian.overrides import GitGuardianAuditLogConfig
+from gitguardian.overrides import GitGuardianAuditLogConfig, GitGuardianCustomTagConfig
 from initialize_client import init_gitguardian_client
 from port_ocean.context.event import event
 from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
@@ -15,8 +15,6 @@ from webhook_processors.public_incident_webhook_processor import (
 )
 
 
-# Optional
-# Listen to the start event of the integration. Called once when the integration starts.
 @ocean.on_start()
 async def on_start() -> None:
     logger.info("Starting GitGuardian integration")
@@ -105,6 +103,7 @@ async def on_resync_developers(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
 async def on_resync_audit_log(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client()
     selector = cast(GitGuardianAuditLogConfig, event.resource_config).selector
+
     query_params = produce_audit_log_query_params(selector)
 
     async for audit_logs in gitguardian_client.get_audit_logs(query_params):
@@ -115,8 +114,11 @@ async def on_resync_audit_log(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
 @ocean.on_resync(ObjectKind.CUSTOM_TAG)
 async def on_resync_custom_tags(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianCustomTagConfig, event.resource_config).selector
 
-    async for custom_tags in gitguardian_client.get_audit_logs():
+    query_params = {"key": selector.key} if getattr(selector, "key", None) else {}
+
+    async for custom_tags in gitguardian_client.get_custom_tags(query_params):
         logger.info(f"Received custom tags batch with {len(custom_tags)} tags")
         yield custom_tags
 
