@@ -4,13 +4,18 @@ from port_ocean.context.ocean import ocean
 from gitguardian.overrides import (
     GitGuardianAuditLogConfig,
     GitGuardianCustomTagConfig,
+    GitGuardianSecretDetectorConfig,
     GitGuardianSourceConfig,
 )
 from initialize_client import init_gitguardian_client
 from port_ocean.context.event import event
 from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
 from integration import ObjectKind
-from utils import produce_audit_log_query_params, produce_source_query_params
+from utils import (
+    produce_audit_log_query_params,
+    produce_secret_detector_query_params,
+    produce_source_query_params,
+)
 from webhook_processors.internal_incident_webhook_processor import (
     InternalSecretIncidentWebhookProcessor,
 )
@@ -42,8 +47,11 @@ async def on_resync_sources(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
 @ocean.on_resync(ObjectKind.SECRET_DETECTOR)
 async def on_resync_detectors(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianSecretDetectorConfig, event.resource_config).selector
 
-    async for detectors in gitguardian_client.get_secret_detectors():
+    query_params = produce_secret_detector_query_params(selector)
+
+    async for detectors in gitguardian_client.get_secret_detectors(query_params):
         logger.info(f"Received secret detector batch with {len(detectors)} detectors")
         yield detectors
 

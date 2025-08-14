@@ -9,31 +9,31 @@ from pydantic import Field
 
 class GitGuardianSourceSelector(Selector):
     search: str | None = Field(
-        description="Returns sources matching this search. Example value: test-repository",
+        description="Returns sources matching this search. Example value: test-repository"
     )
     last_scan_status: str | None = Field(
-        description="Filter sources based on the status of their latest historical scan. Available filter values include: pending, running, canceled, failed, too_large, timeout, pending_timeout, and finished",
+        description="Filter sources based on the status of their latest historical scan. Available filter values include: pending, running, canceled, failed, too_large, timeout, pending_timeout, and finished"
     )
     health: str | None = Field(
-        description="Filter sources based on their health status. Available filter values include: safe, unknown, and at_risk",
+        description="Filter sources based on their health status. Available filter values include: safe, unknown, and at_risk"
     )
     type: str | None = Field(
-        description="Filter sources based on their integration type. Available filter values include: bitbucket, bitbucket_cloud, github, gitlab, azure_devops, slack, jira_cloud, confluence_cloud, microsoft_teams, confluence_data_center, jira_data_center, servicenow, sharepoint_online, sharepoint_online_drive, sharepoint_online_pages",
+        description="Filter sources based on their integration type. Available filter values include: bitbucket, bitbucket_cloud, github, gitlab, azure_devops, slack, jira_cloud, confluence_cloud, microsoft_teams, confluence_data_center, jira_data_center, servicenow, sharepoint_online, sharepoint_online_drive, sharepoint_online_pages"
     )
     ordering: str | None = Field(
-        description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: last_scan_date, and -last_scan_date",
+        description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: last_scan_date and -last_scan_date"
     )
     visibility: str | None = Field(
-        description="Filter sources based on their visibility status. Available filter values include: public, private, and internal",
+        description="Filter sources based on their visibility status. Available filter values include: public, private, and internal"
     )
     external_id: str | None = Field(
-        description="Filter sources based on their external ID. Example value: 1",
+        description="Filter sources based on their external ID. Example value: 1"
     )
     source_criticality: str | None = Field(
-        description="Filter sources based on their criticality level. Available filter values include: critical, high, medium, low, and unknown",
+        description="Filter sources based on their criticality level. Available filter values include: critical, high, medium, low, and unknown"
     )
     monitored: bool | None = Field(
-        description="Filter sources by monitored value. Available filter values include: true, false",
+        description="Filter sources by monitored value. Available filter values include: true, false"
     )
 
 
@@ -43,10 +43,17 @@ class GitGuardianSourceConfig(ResourceConfig):
 
 
 class GitGuardianSecretDetectorSelector(Selector):
-    filter_query: str | None = None
-    fields: str | None = Field(
-        description="Additional fields to be included in the API response",
-        default="*all",
+    is_active: bool | None = Field(
+        description="Filter only active or inactive detectors. Available filter values include: true, false"
+    )
+    type: str | None = Field(
+        description="Filter detectors on their type. Available filter values include: specific generic custom"
+    )
+    search: str | None = Field(
+        description="Returns detectors matching this search filter. Example value: aws"
+    )
+    ordering: str | None = Field(
+        description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: name and -name"
     )
 
 

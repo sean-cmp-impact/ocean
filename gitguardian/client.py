@@ -244,10 +244,12 @@ class GitGuardianClient:
         ):
             yield source_incidents
 
-    async def get_secret_detectors(self) -> AsyncGenerator[list[dict[str, Any]], None]:
+    async def get_secret_detectors(
+        self, query_params: Optional[dict[str, Any]] = None
+    ) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all secret detectors.")
         async for detectors in self._send_paginated_request(
-            endpoint=Endpoints.SECRET_DETECTORS
+            endpoint=Endpoints.SECRET_DETECTORS, query_params=query_params
         ):
             yield detectors
 
