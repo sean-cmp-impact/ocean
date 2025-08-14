@@ -1,4 +1,4 @@
-from typing import Any, Literal, Optional
+from typing import Literal, Optional
 from port_ocean.core.handlers.port_app_config.models import (
     PortAppConfig,
     ResourceConfig,
@@ -8,10 +8,32 @@ from pydantic import Field
 
 
 class GitGuardianSourceSelector(Selector):
-    filter_query: str | None = None
-    fields: str | None = Field(
-        description="Additional fields to be included in the API response",
-        default="*all",
+    search: str | None = Field(
+        description="Returns sources matching this search. Example value: test-repository",
+    )
+    last_scan_status: str | None = Field(
+        description="Filter sources based on the status of their latest historical scan. Available filter values include: pending, running, canceled, failed, too_large, timeout, pending_timeout, and finished",
+    )
+    health: str | None = Field(
+        description="Filter sources based on their health status. Available filter values include: safe, unknown, and at_risk",
+    )
+    type: str | None = Field(
+        description="Filter sources based on their integration type. Available filter values include: bitbucket, bitbucket_cloud, github, gitlab, azure_devops, slack, jira_cloud, confluence_cloud, microsoft_teams, confluence_data_center, jira_data_center, servicenow, sharepoint_online, sharepoint_online_drive, sharepoint_online_pages",
+    )
+    ordering: str | None = Field(
+        description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: last_scan_date, and -last_scan_date",
+    )
+    visibility: str | None = Field(
+        description="Filter sources based on their visibility status. Available filter values include: public, private, and internal",
+    )
+    external_id: str | None = Field(
+        description="Filter sources based on their external ID. Example value: 1",
+    )
+    source_criticality: str | None = Field(
+        description="Filter sources based on their criticality level. Available filter values include: critical, high, medium, low, and unknown",
+    )
+    monitored: bool | None = Field(
+        description="Filter sources by monitored value. Available filter values include: true, false",
     )
 
 
@@ -113,25 +135,25 @@ class GitGuardianDeveloperConfig(ResourceConfig):
 
 class GitGuardianAuditLogSelector(Selector):
     date_before: str | None = Field(
-        description="Audit log entries found before this date. Example: 2025-08-15T14:15:22Z",
+        description="Audit log entries found before this date. Example value: 2025-08-15T14:15:22Z",
     )
     date_after: str | None = Field(
-        description="Audit log entries found after this date. Example: 2025-08-15T14:15:22Z",
+        description="Audit log entries found after this date. Example value: 2025-08-15T14:15:22Z",
     )
     event_name: str | None = Field(
-        description="Audit log entries matching this event name. Example: user.logged_in",
+        description="Audit log entries matching this event name. Example value: user.logged_in",
     )
     member_id: Optional[int] | None = Field(
-        description="Audit log entries to retrieve for the specified member id. Example: 3252",
+        description="Audit log entries to retrieve for the specified member id. Example value: 3252",
     )
     member_name: str | None = Field(
-        description="Audit log entries matching this member name. Example: John Smith",
+        description="Audit log entries matching this member name. Example value: John Smith",
     )
     member_email: str | None = Field(
-        description="Audit log entries matching this member email. Example: john.smith@example.org",
+        description="Audit log entries matching this member email. Example value: john.smith@example.org",
     )
     ip_address: str | None = Field(
-        description="Audit log entries matching this IP address. Example: 8.8.8.8",
+        description="Audit log entries matching this IP address. Example value: 8.8.8.8",
     )
 
 
@@ -142,7 +164,7 @@ class GitGuardianAuditLogConfig(ResourceConfig):
 
 class GitGuardianCustomTagSelector(Selector):
     key: str | None = Field(
-        description="Filter on the specified custom tag key. Example: env",
+        description="Filter on the specified custom tag key. Example value: env",
     )
 
 

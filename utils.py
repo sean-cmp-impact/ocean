@@ -1,5 +1,5 @@
 from typing import Any, Optional
-from gitguardian.overrides import GitGuardianAuditLogSelector
+from gitguardian.overrides import GitGuardianAuditLogSelector, GitGuardianSourceSelector
 
 
 def produce_audit_log_query_params(
@@ -13,6 +13,28 @@ def produce_audit_log_query_params(
         "member_name",
         "member_email",
         "ip_address",
+    ]
+    query_params = {
+        field: getattr(selector, field)
+        for field in fields
+        if getattr(selector, field) is not None and getattr(selector, field) != ""
+    }
+    return query_params or None
+
+
+def produce_source_query_params(
+    selector: GitGuardianSourceSelector,
+) -> Optional[dict[str, Any]]:
+    fields = [
+        "search",
+        "last_scan_status",
+        "health",
+        "type",
+        "ordering",
+        "visibility",
+        "external_id",
+        "source_criticality",
+        "monitored",
     ]
     query_params = {
         field: getattr(selector, field)

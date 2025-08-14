@@ -219,9 +219,13 @@ class GitGuardianClient:
         ):
             yield public_occurrences
 
-    async def get_sources(self) -> AsyncGenerator[list[dict[str, Any]], None]:
+    async def get_sources(
+        self, query_params: Optional[dict[str, Any]] = None
+    ) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all sources known by GitGuardian.")
-        async for sources in self._send_paginated_request(endpoint=Endpoints.SOURCES):
+        async for sources in self._send_paginated_request(
+            endpoint=Endpoints.SOURCES, query_params=query_params
+        ):
             yield sources
 
     async def get_single_source(self, source_id: int) -> dict[str, Any]:

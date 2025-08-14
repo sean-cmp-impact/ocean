@@ -1,12 +1,16 @@
 from typing import Any, cast
 from loguru import logger
 from port_ocean.context.ocean import ocean
-from gitguardian.overrides import GitGuardianAuditLogConfig, GitGuardianCustomTagConfig
+from gitguardian.overrides import (
+    GitGuardianAuditLogConfig,
+    GitGuardianCustomTagConfig,
+    GitGuardianSourceConfig,
+)
 from initialize_client import init_gitguardian_client
 from port_ocean.context.event import event
 from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
 from integration import ObjectKind
-from utils import produce_audit_log_query_params
+from utils import produce_audit_log_query_params, produce_source_query_params
 from webhook_processors.internal_incident_webhook_processor import (
     InternalSecretIncidentWebhookProcessor,
 )
@@ -26,8 +30,11 @@ async def on_start() -> None:
 @ocean.on_resync(ObjectKind.SOURCE)
 async def on_resync_sources(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianSourceConfig, event.resource_config).selector
 
-    async for sources in gitguardian_client.get_sources():
+    query_params = produce_source_query_params(selector)
+
+    async for sources in gitguardian_client.get_sources(query_params):
         logger.info(f"Received source batch with {len(sources)} sources")
         yield sources
 
