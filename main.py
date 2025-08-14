@@ -1,9 +1,12 @@
+from typing import cast
 from loguru import logger
 from port_ocean.context.ocean import ocean
+from gitguardian.overrides import GitGuardianAuditLogConfig
 from initialize_client import init_gitguardian_client
 from port_ocean.context.event import event
 from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
 from integration import ObjectKind
+from utils import produce_audit_log_query_params
 from webhook_processors.internal_incident_webhook_processor import (
     InternalSecretIncidentWebhookProcessor,
 )
@@ -101,8 +104,10 @@ async def on_resync_developers(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
 @ocean.on_resync(ObjectKind.AUDIT_LOG)
 async def on_resync_audit_log(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
     gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianAuditLogConfig, event.resource_config).selector
+    query_params = produce_audit_log_query_params(selector)
 
-    async for audit_logs in gitguardian_client.get_audit_logs():
+    async for audit_logs in gitguardian_client.get_audit_logs(query_params):
         logger.info(f"Received audit logs batch with {len(audit_logs)} logs")
         yield audit_logs
 
