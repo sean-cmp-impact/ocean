@@ -13,6 +13,7 @@ from webhook_processors.base_webhook_processor import BaseGitGuardianWebhookProc
 
 WEBHOOK_SECRET = "testsecret"
 TIMESTAMP = str(time.time())
+DEFAULT_PAYLOAD = {"action": "incident_triggered"}
 
 
 @pytest.fixture
@@ -47,10 +48,9 @@ class BaseWebhookProcessorTest(ABC):
     ) -> None:
         self._set_webhook_secret(mock_context)
 
-        payload = {"action": "incident_triggered"}
-        body = json.dumps(payload).encode("utf-8")
-        signature = self._get_signature(body, "sha256")
-        event = self._init_event(body, signature)
+        body = json.dumps(DEFAULT_PAYLOAD).encode("utf-8")
+        signature = self._make_signature(body)
+        event = self._make_event(body, signature)
 
         result = await base_processor.should_process_event(event)
         assert result is True
@@ -62,10 +62,9 @@ class BaseWebhookProcessorTest(ABC):
     ) -> None:
         self._set_webhook_secret(mock_context)
 
-        payload = {"action": "incident_triggered"}
-        body = json.dumps(payload).encode("utf-8")
+        body = json.dumps(DEFAULT_PAYLOAD).encode("utf-8")
         signature = "sha256=invalidsignature"
-        event = self._init_event(body, signature)
+        event = self._make_event(body, signature)
 
         result = await base_processor.should_process_event(event)
         assert result is False
@@ -77,10 +76,9 @@ class BaseWebhookProcessorTest(ABC):
     ) -> None:
         self._set_webhook_secret(mock_context)
 
-        payload = {"action": "incident_triggered"}
-        body = json.dumps(payload).encode("utf-8")
-        signature = self._get_signature(body, "md5")
-        event = self._init_event(body, signature)
+        body = json.dumps(DEFAULT_PAYLOAD).encode("utf-8")
+        signature = self._make_signature(body, hashlib.md5)
+        event = self._make_event(body, signature)
 
         result = await base_processor.should_process_event(event)
         assert result is False
@@ -91,12 +89,11 @@ class BaseWebhookProcessorTest(ABC):
         mock_context: PortOceanContext,
     ) -> None:
         self._set_webhook_secret(mock_context)
-        payload = {"action": "incident_triggered"}
-        body = json.dumps(payload).encode("utf-8")
-        signature = self._get_signature(body, "sha256")
+        body = json.dumps(DEFAULT_PAYLOAD).encode("utf-8")
+        signature = self._make_signature(body)
         headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
 
-        assert await base_processor.authenticate(payload, headers) is True
+        assert await base_processor.authenticate(DEFAULT_PAYLOAD, headers) is True
 
     async def test_authenticate_with_expected_config_and_no_headers(
         self,
@@ -112,12 +109,11 @@ class BaseWebhookProcessorTest(ABC):
         mock_context: PortOceanContext,
     ) -> None:
         self._unset_webhook_secret(mock_context)
-        payload = {"action": "incident_triggered"}
-        body = json.dumps(payload).encode("utf-8")
-        signature = self._get_signature(body, "sha256")
+        body = json.dumps(DEFAULT_PAYLOAD).encode("utf-8")
+        signature = self._make_signature(body)
         headers = {"gitguardian-signature": signature, "timestamp": TIMESTAMP}
 
-        assert await base_processor.authenticate(payload, headers) is False
+        assert await base_processor.authenticate(DEFAULT_PAYLOAD, headers) is False
 
     @abstractmethod
     async def test_get_matching_kinds(
@@ -126,12 +122,12 @@ class BaseWebhookProcessorTest(ABC):
     ) -> None:
         pass
 
-    def _get_signature(self, body: bytes, hash_algorithm: str):
-        return f"{hash_algorithm}={hmac.new(
-            bytes(TIMESTAMP + WEBHOOK_SECRET, "utf-8"), body, hashlib.sha256
+    def _make_signature(self, body: bytes, hash_algorithm: hashlib = hashlib.sha256):
+        return f"{hash_algorithm().name}={hmac.new(
+            bytes(TIMESTAMP + WEBHOOK_SECRET, "utf-8"), body, hash_algorithm
         ).hexdigest()}"
 
-    def _init_event(self, body: bytes, signature: str):
+    def _make_event(self, body: bytes, signature: str):
         event = MagicMock()
         event._original_request = MagicMock()
         event._original_request.body = AsyncMock(return_value=body)

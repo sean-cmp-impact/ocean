@@ -142,24 +142,23 @@ class TestInternalSecretIncidentWebhookProcessor(BaseWebhookProcessorTest):
         assert result == [ObjectKind.INTERNAL_SECRET_INCIDENT]
 
     @pytest.mark.asyncio
-    async def test_validate_payload_with_incident_action(
+    @pytest.mark.parametrize(
+        "payload,expected",
+        [
+            ({"action": "incident_assigned"}, True),
+            ({"action": "some_other_action"}, False),
+            ({}, False),
+        ],
+    )
+    async def test_validate_payload_variants(
         self,
         internal_incident_processor: InternalSecretIncidentWebhookProcessor,
+        payload: dict,
+        expected: bool,
     ) -> None:
-        payload = self._get_mocked_assign_event_payload()
+        """Test payload validation for various action types."""
         result = await internal_incident_processor.validate_payload(payload=payload)
-
-        assert result is True
-
-    @pytest.mark.asyncio
-    async def test_validate_payload_with_no_incident_action(
-        self,
-        internal_incident_processor: InternalSecretIncidentWebhookProcessor,
-    ) -> None:
-        payload = {"action": "some_other_action"}
-        result = await internal_incident_processor.validate_payload(payload=payload)
-
-        assert result is False
+        assert result is expected
 
     @pytest.mark.asyncio
     async def test_handle_event(
