@@ -32,6 +32,6 @@ This integration provides the following resources:
 - **audit_log**: Audit logs of all user activity that happens within your GitGuardian dashboard
 - **custom_tag**: GitGuardian custom tags
 
-#### Install & use the integration - [Integration documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/) *Replace this link with a link to this integration's documentation*
+#### Install & use the integration - [Integration documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/)
 
 #### Develop & improve the integration - [Ocean integration development documentation](https://ocean.getport.io/develop-an-integration/)
