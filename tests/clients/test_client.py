@@ -141,88 +141,31 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_single_team(mock_gitguardian_client: GitGuardianClient) -> None:
-    """Test get_single_team method"""
-    team_id = 1313
-    team_data: dict[str, Any] = {
-        "data": get_single_mocked_team(team_id, "feature team A")
-    }
-
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
-        mock_request.return_value = team_data
-        result = await mock_gitguardian_client.get_single_team(team_id)
-
-        mock_request.assert_called_once_with(endpoint=f"{Endpoints.TEAMS}/{team_id}")
-        assert result == team_data["data"]
-
-
-@pytest.mark.asyncio
-async def test_get_teams(mock_gitguardian_client: GitGuardianClient) -> None:
-    """Test get_teams method"""
-    next_endpoint = f"v1/{Endpoints.TEAMS}?cursor={CURSOR}&per_page=50"
-    teams_response: dict[str, list[dict[str, Any]]] = {
-        "data": [
-            f"{get_single_mocked_team(1234, "feature team A")}",
-            f"{get_single_mocked_team(5678, "feature team B")}",
-        ],
-        "links": {
-            "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
-                "rel": "next",
-            }
-        },
-    }
-
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
-        mock_request.side_effect = [teams_response, EMPTY_RESPONSE]
-
-        teams = []
-        async for team_batch in mock_gitguardian_client.get_teams():
-            teams.extend(team_batch)
-
-        assert len(teams) == 2
-        assert teams == teams_response["data"]
-        mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}",
-            method="GET",
-            query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
-        )
-
-
-@pytest.mark.asyncio
-async def test_get_single_workspace_member(
+async def test_get_single_user(
     mock_gitguardian_client: GitGuardianClient,
 ) -> None:
-    """Test get_single_workspace_member method"""
-    member_id = 3252
-    workspace_member_data: dict[str, Any] = {
-        "data": get_single_mocked_workspace_member(member_id, "John Doe")
-    }
+    """Test get_single_user method"""
+    user_id = 3252
+    user_data: dict[str, Any] = {"data": get_single_mocked_user(user_id, "John Doe")}
 
     with patch.object(
         mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
     ) as mock_request:
-        mock_request.return_value = workspace_member_data
-        result = await mock_gitguardian_client.get_single_workspace_member(member_id)
+        mock_request.return_value = user_data
+        result = await mock_gitguardian_client.get_single_user(user_id)
 
-        mock_request.assert_called_once_with(
-            endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}"
-        )
-        assert result == workspace_member_data["data"]
+        mock_request.assert_called_once_with(endpoint=f"{Endpoints.USERS}/{user_id}")
+        assert result == user_data["data"]
 
 
 @pytest.mark.asyncio
-async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> None:
-    """Test workspace_members method"""
-    next_endpoint = f"v1/{Endpoints.WORKSPACE_MEMBERS}?cursor={CURSOR}&per_page=50"
+async def test_get_users(mock_gitguardian_client: GitGuardianClient) -> None:
+    """Test get_users method"""
+    next_endpoint = f"v1/{Endpoints.USERS}?cursor={CURSOR}&per_page=50"
     members_response: dict[str, list[dict[str, Any]]] = {
         "data": [
-            f"{get_single_mocked_workspace_member(1234, "John Doe")}",
-            f"{get_single_mocked_workspace_member(5678, "Jane Doe")}",
+            f"{get_single_mocked_user(1234, "John Doe")}",
+            f"{get_single_mocked_user(5678, "Jane Doe")}",
         ],
         "links": {
             "next": {
@@ -238,7 +181,7 @@ async def test_workspace_members(mock_gitguardian_client: GitGuardianClient) -> 
         mock_request.side_effect = [members_response, EMPTY_RESPONSE]
 
         members = []
-        async for member_batch in mock_gitguardian_client.get_workspace_members():
+        async for member_batch in mock_gitguardian_client.get_users():
             members.extend(member_batch)
 
         assert len(members) == 2
@@ -343,16 +286,6 @@ async def test_get_single_public_secret_incident(
         assert result == public_secret_incident_data["data"]
 
 
-def get_single_mocked_team(team_id: int, team_name: str):
-    return {
-        "id": team_id,
-        "name": team_name,
-        "description": "Description of my team",
-        "is_global": False,
-        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/settings/user/teams/1",
-    }
-
-
 @pytest.mark.asyncio
 async def test_get_public_secret_incidents(
     mock_gitguardian_client: GitGuardianClient,
@@ -394,9 +327,9 @@ async def test_get_public_secret_incidents(
         )
 
 
-def get_single_mocked_workspace_member(member_id: int, name: str):
+def get_single_mocked_user(user_id: int, name: str):
     return {
-        "id": member_id,
+        "id": user_id,
         "name": name,
         "email": f"{name.replace(" ", ".")}@test.org",
         "role": "owner",

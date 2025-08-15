@@ -10,12 +10,7 @@ class ObjectKind(StrEnum):
     SECRET_DETECTOR = "secret_detector"
     INTERNAL_SECRET_INCIDENT = "internal_secret_incident"
     PUBLIC_SECRET_INCIDENT = "public_secret_incident"
-    TEAM = "team"
-    TEAM_MEMBER = "team_member"
-    WORKSPACE_MEMBER = "workspace_member"
-    DEVELOPER = "developer"
-    AUDIT_LOG = "audit_log"
-    CUSTOM_TAG = "custom_tag"
+    USER = "user"
 
 
 class GitGuardianIntegration(BaseIntegration):

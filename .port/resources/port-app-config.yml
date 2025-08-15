@@ -68,10 +68,9 @@ resources:
         mappings:
           identifier: .id
           title: '(.id + ": " + .detector.name)'
-          blueprint: '"gitguardianSecretIncident"'
+          blueprint: '"gitguardianInternalIncident"'
           properties:
             id: .id
-            exposure: "internal"
             date: .date
             detector.name: .detector.name
             detector.displayName: .detector.display_name
@@ -90,7 +89,7 @@ resources:
             severity: .severity
             validity: .validity
             resolvedAt: .resolved_at
-            shareUrl: share_url
+            shareUrl: .share_url
   - kind: public_secret_incident
     selector:
       query: 'true'
@@ -99,10 +98,9 @@ resources:
         mappings:
           identifier: .id
           title: '(.id + ": " + .detector.name)'
-          blueprint: '"gitguardianSecretIncident"'
+          blueprint: '"gitguardianPublicIncident"'
           properties:
             id: .id
-            exposure: "public"
             date: .date
             detector.name: .detector.name
             detector.displayName: .detector.display_name
@@ -121,8 +119,9 @@ resources:
             severity: .severity
             validity: .validity
             resolvedAt: .resolved_at
-            shareUrl: share_url
-  - kind: team
+            shareUrl: .share_url
+            declarative_secret_status: .declarative_secret_status
+  - kind: user
     selector:
       query: 'true'
     port:
@@ -130,22 +129,7 @@ resources:
         mappings:
           identifier: .id
           title: .name
-          blueprint: '"gitguardianTeam"'
-          properties:
-            id: .id
-            name: .name
-            description: .description
-            isGlobal: .is_global
-            gitguardianUrl: .gitguardian_url
-  - kind: workspace_member
-    selector:
-      query: 'true'
-    port:
-      entity:
-        mappings:
-          identifier: .id
-          title: .name
-          blueprint: '"gitguardianWorkspaceMember"'
+          blueprint: '"gitguardianUser"'
           properties:
             id: .id
             name: .name
@@ -154,68 +138,3 @@ resources:
             active: .active
             createdAt: .created_at
             lastLogin: .last_login
-  - kind: team_member
-    selector:
-      query: 'true'
-    port:
-      entity:
-        mappings:
-          identifier: .id
-          title: '(.member_id + ": " + .incident_permission)'
-          blueprint: '"gitguardianTeamMember"'
-          properties:
-            id: .id
-            memberId: .member_id
-            teamId: .team_id
-            isTeamLeader: .is_team_leader
-            incidentPermission: .incident_permission
-  - kind: developer
-    selector:
-      query: 'true'
-    port:
-      entity:
-        mappings:
-          identifier: .id
-          title: '(.type + ":" " + .name)'
-          blueprint: '"gitguardianDeveloper"'
-          properties:
-            id: .id
-            name: .name
-            type: .type
-            emails: .emails
-            firstLinkedAt: .first_linked_at
-            isActive: .is_active
-            githubId: .github_id
-            githubLogin: .github_login
-            avatarUrl: .avatar_url
-  - kind: audit_log
-    selector:
-      query: 'true'
-    port:
-      entity:
-        mappings:
-          identifier: .id
-          title: '(.date + " - " " + .event_name)'
-          blueprint: '"gitguardianAuditLog"'
-          properties:
-            id: .id
-            date: .date
-            memberEmail: .member_email
-            memberName: .member_name
-            memberId: .member_id
-            actionType: .action_type
-            eventName: .event_name
-            data: .data
-  - kind: custom_tag
-    selector:
-      query: 'true'
-    port:
-      entity:
-        mappings:
-          identifier: .id
-          title: .key
-          blueprint: '"gitguardianCustomTag"'
-          properties:
-            id: .id
-            key: .key
-            value: .value

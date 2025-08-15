@@ -25,12 +25,7 @@ This integration provides the following resources:
 - **secret_detector**: GitGuardian secret detectors
 - **internal_secret_incident**: Internal secret incidents found by GitGuardian
 - **public_secret_incident**: Public secret incidents found by GitGuardian
-- **team**: Teams configured in GitGuardian
-- **team_member**: Memberships of a GitGuardian team
-- **workspace_member**: GitGuardian workspace members
-- **developer**: Developers in the public perimeter
-- **audit_log**: Audit logs of all user activity that happens within your GitGuardian dashboard
-- **custom_tag**: GitGuardian custom tags
+- **user**: GitGuardian users, also known as workspace members
 
 #### Install & use the integration - [Integration documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/)
 

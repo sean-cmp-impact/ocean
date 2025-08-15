@@ -1,14 +1,10 @@
 from typing import Any, Optional
 from gitguardian.overrides import (
-    GitGuardianAuditLogSelector,
-    GitGuardianDeveloperSelector,
     GitGuardianInternalSecretIncidentSelector,
     GitGuardianPublicSecretIncidentSelector,
     GitGuardianSecretDetectorSelector,
     GitGuardianSourceSelector,
-    GitGuardianTeamMemberSelector,
-    GitGuardianTeamSelector,
-    GitGuardianWorkspaceMemberSelector,
+    GitGuardianUserSelector,
 )
 
 
@@ -19,21 +15,6 @@ def _produce_query_params(selector: Any, fields: list[str]) -> Optional[dict[str
         if getattr(selector, field) is not None and getattr(selector, field) != ""
     }
     return query_params or None
-
-
-def produce_audit_log_query_params(
-    selector: GitGuardianAuditLogSelector,
-) -> Optional[dict[str, Any]]:
-    fields = [
-        "date_after",
-        "date_before",
-        "event_name",
-        "member_id",
-        "member_name",
-        "member_email",
-        "ip_address",
-    ]
-    return _produce_query_params(selector, fields)
 
 
 def produce_source_query_params(
@@ -114,29 +95,8 @@ def produce_public_secret_incidents_query_params(
     return _produce_query_params(selector, fields)
 
 
-def produce_team_query_params(
-    selector: GitGuardianTeamSelector,
-) -> Optional[dict[str, Any]]:
-    fields = ["is_global", "search"]
-    return _produce_query_params(selector, fields)
-
-
-def produce_workspace_member_query_params(
-    selector: GitGuardianWorkspaceMemberSelector,
+def produce_user_query_params(
+    selector: GitGuardianUserSelector,
 ) -> Optional[dict[str, Any]]:
     fields = ["access_level", "active", "search", "ordering"]
-    return _produce_query_params(selector, fields)
-
-
-def produce_team_member_query_params(
-    selector: GitGuardianTeamMemberSelector,
-) -> Optional[dict[str, Any]]:
-    fields = ["is_team_leader", "incident_permission", "member_id"]
-    return _produce_query_params(selector, fields)
-
-
-def produce_developer_query_params(
-    selector: GitGuardianDeveloperSelector,
-) -> Optional[dict[str, Any]]:
-    fields = ["search", "ordering"]
     return _produce_query_params(selector, fields)

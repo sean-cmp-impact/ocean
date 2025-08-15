@@ -177,21 +177,7 @@ class GitGuardianPublicSecretIncidentConfig(ResourceConfig):
     kind: Literal["public_secret_incident"]
 
 
-class GitGuardianTeamSelector(Selector):
-    is_global: bool | None = Field(
-        description="Filter on/exclude the 'All-incidents' team. Available filter values include: true and false"
-    )
-    search: str | None = Field(
-        description="Search teams based on their name and/or description. Example value: finance"
-    )
-
-
-class GitGuardianTeamConfig(ResourceConfig):
-    selector: GitGuardianTeamSelector
-    kind: Literal["team"]
-
-
-class GitGuardianWorkspaceMemberSelector(Selector):
+class GitGuardianUserSelector(Selector):
     access_level: str | None = Field(
         description="Filter members based on their access level. Available filter values include: owner, manager, member, and restricted"
     )
@@ -206,81 +192,9 @@ class GitGuardianWorkspaceMemberSelector(Selector):
     )
 
 
-class GitGuardianWorkspaceMemberConfig(ResourceConfig):
-    selector: GitGuardianWorkspaceMemberSelector
-    kind: Literal["workspace_member"]
-
-
-class GitGuardianTeamMemberSelector(Selector):
-    team_id: int = Field(
-        description="Filter team memberships for a specific team ID. Example value: 5678"
-    )
-    is_team_leader: bool | None = Field(
-        description="Filter team memberships that are team leaders. Available filter values include: true and false"
-    )
-    incident_permission: str | None = Field(
-        description="Filter team memberships with a specific team permission. Available filter values include: can_manage and cannot_manage"
-    )
-    member_id: Optional[int] | None = Field(
-        description="Filter team memberships for a specific member ID. Example value: 1234"
-    )
-
-
-class GitGuardianTeamMemberConfig(ResourceConfig):
-    selector: GitGuardianTeamMemberSelector
-    kind: Literal["team_member"]
-
-
-class GitGuardianDeveloperSelector(Selector):
-    search: str | None = Field(description="Search developers matching this search.")
-    ordering: str | None = Field(
-        description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: github_login, -github_login, name, -name, emails, -emails, is_active, and -is_active"
-    )
-
-
-class GitGuardianDeveloperConfig(ResourceConfig):
-    selector: GitGuardianDeveloperSelector
-    kind: Literal["developer"]
-
-
-class GitGuardianAuditLogSelector(Selector):
-    date_before: str | None = Field(
-        description="Audit log entries found before this date. Example value: 2025-08-15T14:15:22Z"
-    )
-    date_after: str | None = Field(
-        description="Audit log entries found after this date. Example value: 2025-08-15T14:15:22Z"
-    )
-    event_name: str | None = Field(
-        description="Audit log entries matching this event name. Example value: user.logged_in"
-    )
-    member_id: Optional[int] | None = Field(
-        description="Audit log entries to retrieve for the specified member id. Example value: 3252"
-    )
-    member_name: str | None = Field(
-        description="Audit log entries matching this member name. Example value: John Smith"
-    )
-    member_email: str | None = Field(
-        description="Audit log entries matching this member email. Example value: john.smith@example.org"
-    )
-    ip_address: str | None = Field(
-        description="Audit log entries matching this IP address. Example value: 8.8.8.8"
-    )
-
-
-class GitGuardianAuditLogConfig(ResourceConfig):
-    selector: GitGuardianAuditLogSelector
-    kind: Literal["audit_log"]
-
-
-class GitGuardianCustomTagSelector(Selector):
-    key: str | None = Field(
-        description="Filter on the specified custom tag key. Example value: env",
-    )
-
-
-class GitGuardianCustomTagConfig(ResourceConfig):
-    selector: GitGuardianCustomTagSelector
-    kind: Literal["custom_tag"]
+class GitGuardianUserConfig(ResourceConfig):
+    selector: GitGuardianUserSelector
+    kind: Literal["user"]
 
 
 class GitGuardianPortAppConfig(PortAppConfig):
@@ -289,11 +203,6 @@ class GitGuardianPortAppConfig(PortAppConfig):
         | GitGuardianSecretDetectorSelector
         | GitGuardianInternalSecretIncidentConfig
         | GitGuardianPublicSecretIncidentConfig
-        | GitGuardianTeamConfig
-        | GitGuardianWorkspaceMemberConfig
-        | GitGuardianTeamMemberConfig
-        | GitGuardianDeveloperConfig
-        | GitGuardianAuditLogConfig
-        | GitGuardianCustomTagConfig
+        | GitGuardianUserConfig
         | ResourceConfig
     ]

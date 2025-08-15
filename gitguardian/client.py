@@ -9,17 +9,12 @@ PAGE_SIZE = 50
 
 
 class Endpoints(StrEnum):
-    AUDIT_LOGS = "audit_logs"
-    CUSTOM_TAGS = "custom_tags"
-    DEVELOPERS = "public-perimeter/developers"
     HEALTH = "health"
     INTERNAL_SECRET_INCIDENTS = "incidents/secrets"
-    INTERNAL_SECRET_OCCURRENCES = "occurrences/secrets"
-    WORKSPACE_MEMBERS = "members"
+    USERS = "members"
     PUBLIC_SECRET_INCIDENTS = "public-incidents/secrets"
     SOURCES = "sources"
     SECRET_DETECTORS = "secret_detectors"
-    TEAMS = "teams"
 
 
 class GitGuardianClient:
@@ -107,33 +102,6 @@ class GitGuardianClient:
                 )
                 raise
 
-    async def get_audit_logs(
-        self, query_params: Optional[dict[str, Any]] = None
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all audit logs from GitGuardian.")
-        async for audit_logs in self._send_paginated_request(
-            endpoint=Endpoints.AUDIT_LOGS, query_params=query_params
-        ):
-            yield audit_logs
-
-    async def get_custom_tags(
-        self, query_params: Optional[dict[str, Any]] = None
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all existing custom tags from GitGuardian.")
-        async for custom_tags in self._send_paginated_request(
-            endpoint=Endpoints.CUSTOM_TAGS, query_params=query_params
-        ):
-            yield custom_tags
-
-    async def get_developers(
-        self, query_params: Optional[dict[str, Any]] = None
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching developers in the public perimeter from GitGuardian.")
-        async for developers in self._send_api_request(
-            endpoint=Endpoints.DEVELOPERS, query_params=query_params
-        ):
-            yield developers
-
     async def get_health(self) -> dict[str, Any]:
         logger.info(f"Checking the status of the API and token.")
         return await self._send_api_request(endpoint=Endpoints.HEALTH)
@@ -158,39 +126,19 @@ class GitGuardianClient:
         )
         return result.get("data")
 
-    async def get_internal_secret_occurrences(
-        self,
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching occurrences of secrets in the monitored perimeter.")
-        async for occurrences in self._send_api_request(
-            endpoint=Endpoints.INTERNAL_SECRET_OCCURRENCES
-        ):
-            yield occurrences
-
-    async def get_workspace_members(
+    async def get_users(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all members of the GitGuardian workspace.")
         async for members in self._send_paginated_request(
-            endpoint=Endpoints.WORKSPACE_MEMBERS, query_params=query_params
+            endpoint=Endpoints.USERS, query_params=query_params
         ):
             yield members
 
-    async def get_single_workspace_member(self, member_id: int) -> dict[str, Any]:
-        logger.info(f"Fetching specific GitGuardian workspace member.")
-        result = await self._send_api_request(
-            endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}"
-        )
+    async def get_single_user(self, user_id: int) -> dict[str, Any]:
+        logger.info(f"Fetching specific GitGuardian user.")
+        result = await self._send_api_request(endpoint=f"{Endpoints.USERS}/{user_id}")
         return result.get("data")
-
-    async def get_member_teams(
-        self, member_id: int
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all members of the GitGuardian workspace.")
-        async for member_teams in self._send_api_request(
-            endpoint=f"{Endpoints.WORKSPACE_MEMBERS}/{member_id}/teams"
-        ):
-            yield member_teams
 
     async def get_public_secret_incidents(
         self, query_params: Optional[dict[str, Any]] = None
@@ -213,17 +161,6 @@ class GitGuardianClient:
             endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}"
         )
         return result.get("data")
-
-    async def get_public_secret_occurrences(
-        self, incident_id: int
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(
-            f"Fetching public secret occurrences detected by the GitGuardian dashboard."
-        )
-        async for public_occurrences in self._send_api_request(
-            endpoint=f"{Endpoints.PUBLIC_SECRET_INCIDENTS}/{incident_id}/occurrences"
-        ):
-            yield public_occurrences
 
     async def get_sources(
         self, query_params: Optional[dict[str, Any]] = None
@@ -258,45 +195,3 @@ class GitGuardianClient:
             endpoint=Endpoints.SECRET_DETECTORS, query_params=query_params
         ):
             yield detectors
-
-    async def get_teams(
-        self, query_params: Optional[dict[str, Any]] = None
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all teams in GitGuardian workspace.")
-        async for teams in self._send_paginated_request(
-            endpoint=Endpoints.TEAMS, query_params=query_params
-        ):
-            yield teams
-
-    async def get_single_team(self, team_id: int) -> dict[str, Any]:
-        logger.info(f"Fetching a single source known by GitGuardian.")
-        result = await self._send_api_request(endpoint=f"{Endpoints.TEAMS}/{team_id}")
-        return result.get("data")
-
-    async def get_team_secrets(
-        self, team_id: int
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all teams in GitGuardian workspace.")
-        async for team_secrets in self._send_paginated_request(
-            endpoint=f"{Endpoints.TEAMS}/{team_id}/secret-incidents"
-        ):
-            yield team_secrets
-
-    async def get_team_membership(
-        self, team_id: int, query_params: Optional[dict[str, Any]] = None
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all memberships of a team.")
-        async for team_memberships in self._send_paginated_request(
-            endpoint=f"{Endpoints.TEAMS}/{team_id}/team_memberships",
-            query_params=query_params,
-        ):
-            yield team_memberships
-
-    async def get_team_sources(
-        self, team_id: int
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching all sources belonging to a team's perimeter.")
-        async for team_sources in self._send_paginated_request(
-            endpoint=f"{Endpoints.TEAMS}/{team_id}/sources"
-        ):
-            yield team_sources

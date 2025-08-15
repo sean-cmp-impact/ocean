@@ -271,8 +271,8 @@
         "relations": {}
     },
     {
-        "identifier": "gitguardianSecretIncident",
-        "title": "GitGuardian Secret Incident",
+        "identifier": "gitguardianInternalIncident",
+        "title": "Internal Secret Incident",
         "icon": "Alert",
         "schema": {
             "properties": {
@@ -280,15 +280,6 @@
                         "title": "Incident ID",
                         "type": "number",
                         "description": "The unique internal secret incident ID"
-                    },
-                    "exposure": {
-                        "title": "Secret Exposure",
-                        "type": "string",
-                        "description": "Indicates the secret's level of exposore",
-                        "enum": [
-                            "INTERNAL",
-                            "PUBLIC"
-                        ]
                     },
                     "date": {
                         "title": "Incident Detection Date",
@@ -428,74 +419,254 @@
                         "title": "Share URL",
                         "type": "string",
                         "format": "url"
+                    },
+                    "custom_tags": {
+                        "title": "Custom Tags",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Custom Tags",
+                            "properties": {
+                                "id": {
+                                    "title": "Custom Tag ID",
+                                    "type": "string",
+                                    "description": "The unique custom tag ID"
+                                },
+                                "key": {
+                                    "title": "Custom Tag Key",
+                                    "type": "string",
+                                    "description": "The unique custom tag key"
+                                },
+                                "value": {
+                                    "title": "Custom Tag Value",
+                                    "type": "string",
+                                    "description": "The unique custom tag value"
+                                }
+                            }
+                        }
                     }
                 },
             "required": []
         },
         "relations": {}
-    },
+    },   
     {
-        "identifier": "gitguardianTeam",
-        "title": "GitGuardian Team",
-        "icon": "Team",
+        "identifier": "gitguardianPublicIncident",
+        "title": "Public Secret Incident",
+        "icon": "Alert",
         "schema": {
             "properties": {
                     "id": {
-                        "title": "Team ID",
+                        "title": "Incident ID",
                         "type": "number",
-                        "description": "The unique GitGuardian team ID"
+                        "description": "The unique internal secret incident ID"
                     },
-                    "name": {
-                        "title": "Team Name",
+                    "date": {
+                        "title": "Incident Detection Date",
                         "type": "string",
-                        "description": "The name of the GitGuardian Team"
+                        "description": "The date and time that the internal secret incident was detected",
+                        "format": "date-time"
                     },
-                    "description": {
-                        "title": "Team Description",
-                        "type": "string",
-                        "description": "A description of the GitGuardian Team"
+                    "detector": {
+                        "title": "Secret Detector Details",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "title": "Detector Name",
+                                "type": "string",
+                                "description": "The Secret Detector name"
+                            },
+                            "displayName": {
+                                "title": "Detector Display Name",
+                                "type": "string",
+                                "description": "The Secret Detector display name"
+                            },
+                            "nature": {
+                                "title": "Detector Type",
+                                "type": "string",
+                                "description": "The type of Secret Detector",
+                                "enum": [
+                                    "SPECIFIC",
+                                    "GENERIC",
+                                    "CUSTOM"
+                                ]
+                            },
+                            "family": {
+                                "title": "Detector Family",
+                                "type": "string",
+                                "description": "The Secret Detector family"
+                            },
+                            "detectorGroupName": {
+                                "title": "Detector Group Name",
+                                "type": "string",
+                                "description": "The Secret Detector group name"
+                            },
+                            "detectorGroupDisplayName": {
+                                "title": "Detector Group Display Name",
+                                "type": "string",
+                                "description": "The Secret Detector group display name"
+                            }                            
+                        }
                     },
-                    "isGlobal": {
-                        "title": "Is Global",
-                        "type": "boolean",
-                        "description": "Indicates if the team is global or not"
+                    "secretId": {
+                        "title": "Secret ID",
+                        "type": "number",
+                        "description": "The unique secret ID"
                     },
                     "gitguardianUrl": {
-                        "title": "GitGuardian URL",
+                        "title": "Incident URL",
                         "type": "string",
                         "format": "url",
-                        "description": "URL to the team in GitGuardian"
-                    }
-                },
+                        "description": "URL to incident in GitGuardian"
+                    },
+                    "regression": {
+                        "title": "Regression",
+                        "type": "boolean",
+                        "description": "Indicates if it is a regression"
+                    },
+                    "status": {
+                        "title": "Incident Status",
+                        "type": "string",
+                        "description": "The status of the internal secret incident",
+                        "enum": [
+                            "IGNORED",
+                            "TRIGGERED",
+                            "ASSIGNED",
+                            "RESOLVED"
+                        ]
+                    },
+                    "occurrencesCount": {
+                        "title": "Incident Occurrences",
+                        "type": "number",
+                        "description": "The amount of times this specific internal secret incident was detected"
+                    },
+                    "ignoreReason": {
+                        "title": "Ignore Reason",
+                        "type": "string",
+                        "description": "The reason an internal secret incident was ignored"
+                    },
+                    "ignoredAt": {
+                        "title": "Ignore At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was ignored",
+                        "format": "date-time"
+                    },
+                    "secretRevoked": {
+                        "title": "Secret Revoked",
+                        "type": "boolean",
+                        "description": "Indicates if the secret has been revoked or not"
+                    },
+                    "severity": {
+                        "title": "Incident Severity",
+                        "type": "string",
+                        "description": "The severity of the internal secret incident",
+                        "enum": [
+                            "CRITICAL",
+                            "HIGH",
+                            "MEDIUM",
+                            "LOW",
+                            "INFO",
+                            "UNKNOWN"
+                        ],
+                        "enumColors": {
+                            "LOW": "green",
+                            "UNKNOWN": "yellow",
+                            "INFO": "yellow",
+                            "MEDIUM": "orange",
+                            "HIGH": "red",
+                            "CRITICAL": "red"
+                        }
+                    },
+                    "validity": {
+                        "title": "Incident Validity",
+                        "type": "string",
+                        "description": "The validity of the internal secret incident",
+                        "enum": [
+                            "VALID",
+                            "INVALID",
+                            "FAILED_TO_CHECK",
+                            "NO_CHECKER",
+                            "UNKNOWN"
+                        ]
+                    },
+                    "resolvedAt": {
+                        "title": "Resolved At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was resolved",
+                        "format": "date-time"
+                    },
+                    "shareUrl": {
+                        "title": "Share URL",
+                        "type": "string",
+                        "format": "url"
+                    },
+                    "custom_tags": {
+                        "title": "Custom Tags",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Custom Tags",
+                            "properties": {
+                                "id": {
+                                    "title": "Custom Tag ID",
+                                    "type": "string",
+                                    "description": "The unique custom tag ID"
+                                },
+                                "key": {
+                                    "title": "Custom Tag Key",
+                                    "type": "string",
+                                    "description": "The unique custom tag key"
+                                },
+                                "value": {
+                                    "title": "Custom Tag Value",
+                                    "type": "string",
+                                    "description": "The unique custom tag value"
+                                }
+                            }
+                        }
+                    },
+                    "declarative_secret_status": {
+                    "title": "Declarative Secret Status",
+                    "type": "string",
+                    "description": "The declarative status of the secret",
+                    "enum": [
+                        "revoked",
+                        "active",
+                        "test_credential",
+                        "false_positive",
+                        "low_risk"
+                    ]   
+                }             
+            },
             "required": []
         },
         "relations": {}
-    },
+    },    
     {
-        "identifier": "gitguardianWorkspaceMember",
-        "title": "GitGuardian Workspace Member",
+        "identifier": "gitguardianUser",
+        "title": "GitGuardian User",
         "icon": "User",
         "schema": {
             "properties": {
                     "id": {
-                        "title": "Member ID",
+                        "title": "User ID",
                         "type": "number",
-                        "description": "The unique GitGuardian workspace member ID"
+                        "description": "The unique GitGuardian user/workspace member ID"
                     },
                     "name": {
-                        "title": "Member Name",
+                        "title": "User Name",
                         "type": "string",
-                        "description": "The name of the workspace member"
+                        "description": "The name of the user/workspace member"
                     },
                     "email": {
-                        "title": "Member Email",
+                        "title": "User Email",
                         "type": "string",
-                        "description": "The email address of the workspace member"
+                        "description": "The email address of the user/workspace member"
                     },
                     "accessLevel": {
                         "title": "Access Level",
                         "type": "string",
-                        "description": "The level of access that the workspace member has",
+                        "description": "The level of access that the user/workspace member has",
                         "enum": [
                             "OWNER",
                             "MANAGER",
@@ -511,193 +682,14 @@
                     "createdAt": {
                         "title": "Created At",
                         "type": "string",
-                        "description": "The date and time the workspace member was created",
+                        "description": "The date and time the user/workspace member was created",
                         "format": "date-time"
                     },
                     "lastLogin": {
                         "title": "Last Login",
                         "type": "string",
-                        "description": "The date and time the workspace member has last logged into GitGuardian",
+                        "description": "The date and time the user/workspace member has last logged into GitGuardian",
                         "format": "date-time"
-                    }
-                },
-            "required": []
-        },
-        "relations": {}
-    },
-    {
-        "identifier": "gitguardianTeamMember",
-        "title": "GitGuardian Team Member",
-        "icon": "User",
-        "schema": {
-            "properties": {
-                    "id": {
-                        "title": "ID",
-                        "type": "number",
-                        "description": "The unique membership ID"
-                    },
-                    "memberId": {
-                        "title": "Member ID",
-                        "type": "number",
-                        "description": "The unique member ID"
-                    },
-                    "teamId": {
-                        "title": "Team ID",
-                        "type": "number",
-                        "description": "The unique GitGuardian team ID"
-                    },
-                    "isTeamLeader": {
-                        "title": "Is Team Leader",
-                        "type": "boolean",
-                        "description": "Indicates if the member is a team leader or not"
-                    },
-                    "incidentPermission": {
-                        "title": "Incident Permission",
-                        "type": "string",
-                        "description": "The incident permissions that the member has in this team",
-                        "enum": [
-                            "CAN_MANAGE",
-                            "CANNOT_MANAGE"
-                        ]
-                    }
-                },
-            "required": []
-        },
-        "relations": {}
-    },
-    {
-        "identifier": "gitguardianDeveloper",
-        "title": "GitGuardian Developer",
-        "icon": "Rocket",
-        "schema": {
-            "properties": {
-                    "id": {
-                        "title": "Developer ID",
-                        "type": "number",
-                        "description": "The unique GitGuardian Developer ID"
-                    },
-                    "name": {
-                        "title": "Developer Name",
-                        "type": "string",
-                        "description": "The name of the GitGuardian Developer"
-                    },
-                    "type": {
-                        "title": "Developer Type",
-                        "type": "string",
-                        "description": "The GitGuardian Developer type"
-                    },
-                    "emails": {
-                        "title": "Emails",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "description": "Email addresses of the Developer"
-                    },
-                    "firstLinkedAt": {
-                        "title": "First Linked At",
-                        "type": "string",
-                        "description": "The date and time the GitGuardian Developer was first linked",
-                        "format": "date-time"
-                    },
-                    "isActive": {
-                        "title": "Is Active",
-                        "type": "boolean",
-                        "description": "Indicates if the developer is active or not"
-                    },
-                    "githubId": {
-                        "title": "GitHub ID",
-                        "type": "number",
-                        "description": "The Developer's GitHub ID"
-                    },
-                    "githubLogin": {
-                        "title": "GitHub Login",
-                        "type": "string",
-                        "description": "The Developer's GitHub Login"
-                    },
-                    "avatarUrl": {
-                        "title": "Avatar URL",
-                        "type": "string",
-                        "format": "url",
-                        "description": "URL of the GitGuardian Developer's avatar"
-                    }
-                },
-            "required": []
-        },
-        "relations": {}
-    },
-    {
-        "identifier": "gitguardianAuditLog",
-        "title": "GitGuardian Audit Log",
-        "icon": "AuditLog",
-        "schema": {
-            "properties": {
-                    "id": {
-                        "title": "Log ID",
-                        "type": "number",
-                        "description": "The GitGuardian audit log ID"
-                    },
-                    "date": {
-                        "title": "Date",
-                        "type": "string",
-                        "description": "The timestamp of the GitGuardian log",
-                        "format": "date-time"
-                    },
-                    "memberEmail": {
-                        "title": "Member Email",
-                        "type": "string",
-                        "description": "The email address of the workspace member"
-                    },
-                    "memberName": {
-                        "title": "Member Name",
-                        "type": "string",
-                        "description": "The name of the GitGuardian workspace member"
-                    },
-                    "memberId": {
-                        "title": "Member ID",
-                        "type": "number",
-                        "description": "The unique ID of the GitGuardian workspace member"
-                    },
-                    "actionType": {
-                        "title": "Action Type",
-                        "type": "string",
-                        "description": "The GitGuardian audit log action type"
-                    },
-                    "eventName": {
-                        "title": "Event Name",
-                        "type": "string",
-                        "description": "The GitGuardian audit log event name"
-                    },
-                    "data": {
-                        "title": "Data",
-                        "type": "string",
-                        "description": "The GitGuardian audit log data"
-                    }
-                },
-            "required": []
-        },
-        "relations": {}
-    },
-    {
-        "identifier": "gitguardianCustomTag",
-        "title": "GitGuardian Custom Tag",
-        "icon": "General",
-        "schema": {
-            "properties": {                    
-                    "id": {
-                        "title": "Custom Tag ID",
-                        "type": "string",
-                        "description": "The unique GitGuardian custom tag ID"
-                    },
-                    "key": {
-                        "title": "Key",
-                        "type": "string",
-                        "description": "The key of the GitGuardian custom tag"
-                    },
-                    "value": {
-                        "title": "Value",
-                        "type": "string",
-                        "description": "The value of the GitGuardian custom tag"
                     }
                 },
             "required": []
