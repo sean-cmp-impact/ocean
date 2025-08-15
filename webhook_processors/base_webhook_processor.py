@@ -60,7 +60,7 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         )
         return webhook_secret_configured and has_required_headers
 
-    async def _empty_response(log_message: str) -> WebhookEventRawResults:
+    def _empty_response(log_message: str) -> WebhookEventRawResults:
         logger.warning(log_message)
         return WebhookEventRawResults(
             updated_raw_results=[],

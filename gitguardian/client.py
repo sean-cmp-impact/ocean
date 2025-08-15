@@ -59,7 +59,7 @@ class GitGuardianClient:
             )
             response.raise_for_status()
             return {"data": response.json(), "links": response.links}
-        except (httpx.HTTPStatusError, Exception) as e:
+        except httpx.HTTPStatusError as e:
             logger.error(
                 f"HTTP error with status code: {e.response.status_code} and response text: {e.response.text}"
             )
@@ -120,7 +120,7 @@ class GitGuardianClient:
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
         logger.info(f"Fetching all existing custom tags from GitGuardian.")
-        async for custom_tags in self._send_api_request(
+        async for custom_tags in self._send_paginated_request(
             endpoint=Endpoints.CUSTOM_TAGS, query_params=query_params
         ):
             yield custom_tags

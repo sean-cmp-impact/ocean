@@ -12,6 +12,15 @@ from gitguardian.overrides import (
 )
 
 
+def _produce_query_params(selector: Any, fields: list[str]) -> Optional[dict[str, Any]]:
+    query_params = {
+        field: getattr(selector, field)
+        for field in fields
+        if getattr(selector, field) is not None and getattr(selector, field) != ""
+    }
+    return query_params or None
+
+
 def produce_audit_log_query_params(
     selector: GitGuardianAuditLogSelector,
 ) -> Optional[dict[str, Any]]:
@@ -24,12 +33,7 @@ def produce_audit_log_query_params(
         "member_email",
         "ip_address",
     ]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_source_query_params(
@@ -46,12 +50,7 @@ def produce_source_query_params(
         "source_criticality",
         "monitored",
     ]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_secret_detector_query_params(
@@ -63,12 +62,7 @@ def produce_secret_detector_query_params(
         "search",
         "ordering",
     ]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_internal_secret_incidents_query_params(
@@ -92,12 +86,7 @@ def produce_internal_secret_incidents_query_params(
         "resolver_id",
         "feedback",
     ]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_public_secret_incidents_query_params(
@@ -122,57 +111,32 @@ def produce_public_secret_incidents_query_params(
         "feedback",
         "declarative_secret_status",
     ]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_team_query_params(
     selector: GitGuardianTeamSelector,
 ) -> Optional[dict[str, Any]]:
     fields = ["is_global", "search"]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_workspace_member_query_params(
     selector: GitGuardianWorkspaceMemberSelector,
 ) -> Optional[dict[str, Any]]:
     fields = ["access_level", "active", "search", "ordering"]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_team_member_query_params(
     selector: GitGuardianTeamMemberSelector,
 ) -> Optional[dict[str, Any]]:
     fields = ["is_team_leader", "incident_permission", "member_id"]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
 
 
 def produce_developer_query_params(
     selector: GitGuardianDeveloperSelector,
 ) -> Optional[dict[str, Any]]:
     fields = ["search", "ordering"]
-    query_params = {
-        field: getattr(selector, field)
-        for field in fields
-        if getattr(selector, field) is not None and getattr(selector, field) != ""
-    }
-    return query_params or None
+    return _produce_query_params(selector, fields)
