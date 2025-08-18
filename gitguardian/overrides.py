@@ -200,7 +200,7 @@ class GitGuardianUserConfig(ResourceConfig):
 class GitGuardianPortAppConfig(PortAppConfig):
     resources: list[
         GitGuardianSourceConfig
-        | GitGuardianSecretDetectorSelector
+        | GitGuardianSecretDetectorConfig
         | GitGuardianInternalSecretIncidentConfig
         | GitGuardianPublicSecretIncidentConfig
         | GitGuardianUserConfig
