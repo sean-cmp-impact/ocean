@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Any, Literal, Optional
 from port_ocean.core.handlers.port_app_config.models import (
     PortAppConfig,
     ResourceConfig,
@@ -7,7 +7,26 @@ from port_ocean.core.handlers.port_app_config.models import (
 from pydantic import Field
 
 
-class GitGuardianSourceSelector(Selector):
+class BaseGitGuardianSelector(Selector):
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        """
+        Produces a dictionary of query parameters from a Selector object
+        by using reflection to get its fields.
+        """
+        fields = [
+            attr
+            for attr in dir(self)
+            if not attr.startswith("_") and not callable(getattr(self, attr))
+        ]
+        query_params = {
+            field: getattr(self, field)
+            for field in fields
+            if getattr(self, field) is not None and getattr(self, field) != ""
+        }
+        return query_params or None
+
+
+class GitGuardianSourceSelector(BaseGitGuardianSelector):
     search: str | None = Field(
         description="Returns sources matching this search. Example value: test-repository"
     )
@@ -36,13 +55,16 @@ class GitGuardianSourceSelector(Selector):
         description="Filter sources by monitored value. Available filter values include: true, false"
     )
 
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        return super().produce_query_params()
+
 
 class GitGuardianSourceConfig(ResourceConfig):
     selector: GitGuardianSourceSelector
     kind: Literal["source"]
 
 
-class GitGuardianSecretDetectorSelector(Selector):
+class GitGuardianSecretDetectorSelector(BaseGitGuardianSelector):
     is_active: bool | None = Field(
         description="Filter only active or inactive detectors. Available filter values include: true, false"
     )
@@ -56,13 +78,16 @@ class GitGuardianSecretDetectorSelector(Selector):
         description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: name and -name"
     )
 
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        return super().produce_query_params()
+
 
 class GitGuardianSecretDetectorConfig(ResourceConfig):
     selector: GitGuardianSecretDetectorSelector
     kind: Literal["secret_detector"]
 
 
-class GitGuardianInternalSecretIncidentSelector(Selector):
+class GitGuardianInternalSecretIncidentSelector(BaseGitGuardianSelector):
     date_before: str | None = Field(
         description="Return internal secret incident entries found before this date. Example value: 2025-08-15T14:15:22Z"
     )
@@ -112,13 +137,16 @@ class GitGuardianInternalSecretIncidentSelector(Selector):
         description="Filter internal secret incidents with or without feedback. Available values include: true and false"
     )
 
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        return super().produce_query_params()
+
 
 class GitGuardianInternalSecretIncidentConfig(ResourceConfig):
     selector: GitGuardianInternalSecretIncidentSelector
     kind: Literal["internal_secret_incident"]
 
 
-class GitGuardianPublicSecretIncidentSelector(Selector):
+class GitGuardianPublicSecretIncidentSelector(BaseGitGuardianSelector):
     date_before: str | None = Field(
         description="Return public secret incident entries found before this date. Example value: 2025-08-15T14:15:22Z"
     )
@@ -171,13 +199,16 @@ class GitGuardianPublicSecretIncidentSelector(Selector):
         description="Filter public secret incidents by their declarative secret status. Available values include: revoked, active, test_credential, false_positive, and low_risk"
     )
 
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        return super().produce_query_params()
+
 
 class GitGuardianPublicSecretIncidentConfig(ResourceConfig):
     selector: GitGuardianPublicSecretIncidentSelector
     kind: Literal["public_secret_incident"]
 
 
-class GitGuardianUserSelector(Selector):
+class GitGuardianUserSelector(BaseGitGuardianSelector):
     access_level: str | None = Field(
         description="Filter members based on their access level. Available filter values include: owner, manager, member, and restricted"
     )
@@ -190,6 +221,9 @@ class GitGuardianUserSelector(Selector):
     ordering: str | None = Field(
         description="Sort the results by their field value. The default sort is ASC, DESC if the field is preceded by a '-'. Available filter values include: created_at, -created_at, last_login, and -last_login"
     )
+
+    def produce_query_params(self) -> Optional[dict[str, Any]]:
+        return super().produce_query_params()
 
 
 class GitGuardianUserConfig(ResourceConfig):
