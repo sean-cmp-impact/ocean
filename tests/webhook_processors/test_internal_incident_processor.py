@@ -49,7 +49,7 @@ def internal_incident_resource_config() -> ResourceConfig:
                 mappings=EntityMapping(
                     identifier=".id",
                     title=".name",
-                    blueprint='"gitguardianSecretIncident"',
+                    blueprint='"gitguardianInternalSecretIncident"',
                     properties={},
                     relations={},
                 )

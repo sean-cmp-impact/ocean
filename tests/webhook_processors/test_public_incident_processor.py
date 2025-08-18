@@ -48,7 +48,7 @@ def public_incident_resource_config() -> ResourceConfig:
                 mappings=EntityMapping(
                     identifier=".id",
                     title=".name",
-                    blueprint='"gitguardianSecretIncident"',
+                    blueprint='"gitguardianPublicSecretIncident"',
                     properties={},
                     relations={},
                 )

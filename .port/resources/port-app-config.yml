@@ -5,7 +5,7 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id
+          identifier: .id|tostring
           title: '(.type + " - " + .full_name)'
           blueprint: '"gitguardianSource"'
           properties:
@@ -66,8 +66,8 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id
-          title: '(.id + ": " + .detector.name)'
+          identifier: .id|tostring
+          title: (.id | tostring) + "-" + .detector.name
           blueprint: '"gitguardianInternalIncident"'
           properties:
             id: .id
@@ -96,8 +96,8 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id
-          title: '(.id + ": " + .detector.name)'
+          identifier: .id|tostring
+          title: (.id | tostring) + "-" + .detector.name
           blueprint: '"gitguardianPublicIncident"'
           properties:
             id: .id
@@ -127,7 +127,7 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id
+          identifier: .id|tostring
           title: .name
           blueprint: '"gitguardianUser"'
           properties:

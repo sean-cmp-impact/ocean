@@ -7,7 +7,7 @@
             "properties": {
                 "id": {
                     "title": "Source ID",
-                    "type": "number",
+                    "type": "string",
                     "description": "The unique GitGuardian source ID"
                 },
                 "sourceType": {                    
@@ -31,14 +31,14 @@
                     "type": "string",
                     "description": "The health of the GitGuardian source",
                     "enum": [
-                        "SAFE",
-                        "UNKNOWN",
-                        "AT_RISK"
+                        "safe",
+                        "unknown",
+                        "at_risk"
                     ],
                     "enumColors": {
-                        "SAFE": "green",
-                        "UNKNOWN": "yellow",
-                        "AT_RISK": "red"
+                        "safe": "green",
+                        "unknown": "yellow",
+                        "at_risk": "red"
                     }
                 },
                 "sourceCriticality": {
@@ -46,18 +46,18 @@
                     "type": "string",
                     "description": "The criticality of the GitGuardian source",
                     "enum": [
-                        "CRITICAL",
-                        "HIGH",
-                        "MEDIUM",
-                        "LOW",
-                        "UNKNOWN"
+                        "critical",
+                        "high",
+                        "medium",
+                        "low",
+                        "unknown"
                     ],
                     "enumColors": {
-                        "LOW": "green",
-                        "UNKNOWN": "yellow",
-                        "MEDIUM": "orange",
-                        "HIGH": "red",
-                        "CRITICAL": "red"
+                        "low": "green",
+                        "unknown": "yellow",
+                        "medium": "orange",
+                        "high": "red",
+                        "critical": "red"
                     }
                 },
                 "openIncidentsCount": {
@@ -179,8 +179,8 @@
                     "type": "string",
                     "description": "The visibility of the GitGuardian source",
                     "enum": [
-                        "PRIVATE",
-                        "PUBLIC"
+                        "private",
+                        "public"
                     ]
                 }         
             },
@@ -209,9 +209,9 @@
                     "type": "string",
                     "description": "The type of Secret Detector",
                     "enum": [
-                        "SPECIFIC",
-                        "GENERIC",
-                        "CUSTOM"
+                        "specific",
+                        "generic",
+                        "custom"
                     ]
                 }, 
                 "category": {
@@ -278,7 +278,7 @@
             "properties": {
                     "id": {
                         "title": "Incident ID",
-                        "type": "number",
+                        "type": "string",
                         "description": "The unique internal secret incident ID"
                     },
                     "date": {
@@ -306,9 +306,9 @@
                                 "type": "string",
                                 "description": "The type of Secret Detector",
                                 "enum": [
-                                    "SPECIFIC",
-                                    "GENERIC",
-                                    "CUSTOM"
+                                    "specific",
+                                    "generic",
+                                    "custom"
                                 ]
                             },
                             "family": {
@@ -349,10 +349,10 @@
                         "type": "string",
                         "description": "The status of the internal secret incident",
                         "enum": [
-                            "IGNORED",
-                            "TRIGGERED",
-                            "ASSIGNED",
-                            "RESOLVED"
+                            "ignored",
+                            "triggered",
+                            "assigned",
+                            "resolved"
                         ]
                     },
                     "occurrencesCount": {
@@ -381,20 +381,20 @@
                         "type": "string",
                         "description": "The severity of the internal secret incident",
                         "enum": [
-                            "CRITICAL",
-                            "HIGH",
-                            "MEDIUM",
-                            "LOW",
-                            "INFO",
-                            "UNKNOWN"
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info",
+                            "unknown"
                         ],
                         "enumColors": {
-                            "LOW": "green",
-                            "UNKNOWN": "yellow",
-                            "INFO": "yellow",
-                            "MEDIUM": "orange",
-                            "HIGH": "red",
-                            "CRITICAL": "red"
+                            "low": "green",
+                            "unknown": "yellow",
+                            "info": "yellow",
+                            "medium": "orange",
+                            "high": "red",
+                            "critical": "red"
                         }
                     },
                     "validity": {
@@ -402,11 +402,11 @@
                         "type": "string",
                         "description": "The validity of the internal secret incident",
                         "enum": [
-                            "VALID",
-                            "INVALID",
-                            "FAILED_TO_CHECK",
-                            "NO_CHECKER",
-                            "UNKNOWN"
+                            "valid",
+                            "invalid",
+                            "failed_to_check",
+                            "no_checker",
+                            "unknown"
                         ]
                     },
                     "resolvedAt": {
@@ -458,7 +458,7 @@
             "properties": {
                     "id": {
                         "title": "Incident ID",
-                        "type": "number",
+                        "type": "string",
                         "description": "The unique internal secret incident ID"
                     },
                     "date": {
@@ -486,9 +486,9 @@
                                 "type": "string",
                                 "description": "The type of Secret Detector",
                                 "enum": [
-                                    "SPECIFIC",
-                                    "GENERIC",
-                                    "CUSTOM"
+                                    "specific",
+                                    "generic",
+                                    "custom"
                                 ]
                             },
                             "family": {
@@ -529,10 +529,10 @@
                         "type": "string",
                         "description": "The status of the internal secret incident",
                         "enum": [
-                            "IGNORED",
-                            "TRIGGERED",
-                            "ASSIGNED",
-                            "RESOLVED"
+                            "ignored",
+                            "triggered",
+                            "assigned",
+                            "resolved"
                         ]
                     },
                     "occurrencesCount": {
@@ -561,20 +561,20 @@
                         "type": "string",
                         "description": "The severity of the internal secret incident",
                         "enum": [
-                            "CRITICAL",
-                            "HIGH",
-                            "MEDIUM",
-                            "LOW",
-                            "INFO",
-                            "UNKNOWN"
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info",
+                            "unknown"
                         ],
                         "enumColors": {
-                            "LOW": "green",
-                            "UNKNOWN": "yellow",
-                            "INFO": "yellow",
-                            "MEDIUM": "orange",
-                            "HIGH": "red",
-                            "CRITICAL": "red"
+                            "low": "green",
+                            "unknown": "yellow",
+                            "info": "yellow",
+                            "medium": "orange",
+                            "high": "red",
+                            "critical": "red"
                         }
                     },
                     "validity": {
@@ -582,11 +582,11 @@
                         "type": "string",
                         "description": "The validity of the internal secret incident",
                         "enum": [
-                            "VALID",
-                            "INVALID",
-                            "FAILED_TO_CHECK",
-                            "NO_CHECKER",
-                            "UNKNOWN"
+                            "valid",
+                            "invalid",
+                            "failed_to_check",
+                            "no_checker",
+                            "unknown"
                         ]
                     },
                     "resolvedAt": {
@@ -650,7 +650,7 @@
             "properties": {
                     "id": {
                         "title": "User ID",
-                        "type": "number",
+                        "type": "string",
                         "description": "The unique GitGuardian user/workspace member ID"
                     },
                     "name": {
@@ -668,10 +668,10 @@
                         "type": "string",
                         "description": "The level of access that the user/workspace member has",
                         "enum": [
-                            "OWNER",
-                            "MANAGER",
-                            "MEMBER",
-                            "RESTRICTED"
+                            "owner",
+                            "manager",
+                            "member",
+                            "restricted"
                         ]
                     },
                     "active": {
