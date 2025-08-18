@@ -41,7 +41,7 @@ class GitGuardianClient:
         method: str = "GET",
         query_params: Optional[dict[str, Any]] = None,
         json_data: Optional[dict[str, Any]] = None,
-    ) -> Response:
+    ) -> dict[str, Any]:
         logger.debug(
             f"Sending API request to {method} {endpoint} with query params: {query_params}"
         )
@@ -82,11 +82,11 @@ class GitGuardianClient:
                 data = response.get("data", [])
                 yield data
 
-                links = response.get("links", [])
+                links = response.get("links", {})
                 if not links:
                     break
 
-                next_url = links.get("next", {})["url"]
+                next_url = links.get("next", {}).get("url")
                 if next_url:
                     parsed_url = URL(next_url)
                     endpoint = parsed_url.raw_path.decode().replace(
@@ -146,7 +146,7 @@ class GitGuardianClient:
         logger.info(
             f"Fetching public secret incidents detected by the GitGuardian dashboard."
         )
-        async for public_incidents in self._send_api_request(
+        async for public_incidents in self._send_paginated_request(
             endpoint=Endpoints.PUBLIC_SECRET_INCIDENTS, query_params=query_params
         ):
             yield public_incidents

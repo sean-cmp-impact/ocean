@@ -31,16 +31,16 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         webhook_secret = ocean.integration_config.get("webhook_secret")
         timestamp = event.headers.get("timestamp", "")
 
-        if signature and not webhook_secret:
+        if webhook_secret is None:
             logger.warning(
-                "Signature found but no secret configured for authenticating incoming webhooks, skipping event."
+                "No webhook secret configured for authenticating incoming webhooks, skipping event."
             )
             return False
 
         # Verify signature if webhook secret configured
         body = await event._original_request.body()
         computed_signature = hmac.new(
-            bytes(timestamp + webhook_secret, "utf-8"),
+            bytes(f"{timestamp}{webhook_secret}", "utf-8"),
             body,
             hashlib.sha256,
         ).hexdigest()
@@ -50,7 +50,8 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
     async def authenticate(
         self, payload: EventPayload, headers: dict[str, Any]
     ) -> bool:
-        # Only basic checks are done here. The payload signature verification is done in should_process_event.
+        # This method only checks for the presence of required headers and webhook secret.
+        # Actual signature verification is performed in should_process_event.
         # See https://ocean.port.io/developing-an-integration/implementing-webhooks/
         webhook_secret_configured = (
             ocean.integration_config.get("webhook_secret") is not None
@@ -60,7 +61,7 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         )
         return webhook_secret_configured and has_required_headers
 
-    def _empty_response(log_message: str) -> WebhookEventRawResults:
+    def _empty_response(self, log_message: str) -> WebhookEventRawResults:
         logger.warning(log_message)
         return WebhookEventRawResults(
             updated_raw_results=[],
