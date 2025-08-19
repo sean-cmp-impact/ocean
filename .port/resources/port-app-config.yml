@@ -81,13 +81,7 @@ resources:
           title: .detector.display_name
           blueprint: '"gitguardianInternalIncident"'
           properties:
-            date: .date
-            detector.name: .detector.name
-            detector.displayName: .detector.display_name
-            detector.nature: .detector.nature
-            detector.family: .detector.family
-            detector.detectorGroupName: .detector.detector_group_name
-            detector.detectorGroupDisplayName: .detector.detector_group_display_name
+            date: .date            
             secretId: .secret_id
             gitguardianUrl: .gitguardian_url
             regression: .regression
@@ -100,6 +94,9 @@ resources:
             validity: .validity
             resolvedAt: .resolved_at
             shareUrl: .share_url
+          relations: {  
+            detector: .detector.name
+          }
   - kind: public_secret_incident
     selector:
       query: 'true'

@@ -286,48 +286,7 @@
                         "type": "string",
                         "description": "The date and time that the internal secret incident was detected",
                         "format": "date-time"
-                    },
-                    "detector": {
-                        "title": "Secret Detector Details",
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "title": "Detector Name",
-                                "type": "string",
-                                "description": "The Secret Detector name"
-                            },
-                            "displayName": {
-                                "title": "Detector Display Name",
-                                "type": "string",
-                                "description": "The Secret Detector display name"
-                            },
-                            "nature": {
-                                "title": "Detector Type",
-                                "type": "string",
-                                "description": "The type of Secret Detector",
-                                "enum": [
-                                    "specific",
-                                    "generic",
-                                    "custom"
-                                ]
-                            },
-                            "family": {
-                                "title": "Detector Family",
-                                "type": "string",
-                                "description": "The Secret Detector family"
-                            },
-                            "detectorGroupName": {
-                                "title": "Detector Group Name",
-                                "type": "string",
-                                "description": "The Secret Detector group name"
-                            },
-                            "detectorGroupDisplayName": {
-                                "title": "Detector Group Display Name",
-                                "type": "string",
-                                "description": "The Secret Detector group display name"
-                            }                            
-                        }
-                    },
+                    },                    
                     "secretId": {
                         "title": "Secret ID",
                         "type": "number",
@@ -448,7 +407,14 @@
                 },
             "required": []
         },
-        "relations": {}
+        "relations": {
+            "detector": {
+                "title": "Detector",
+                "target": "gitguardianSecretDetector",
+                "required": false,
+                "many": false
+            }
+        }
     },   
     {
         "identifier": "gitguardianPublicIncident",
@@ -466,47 +432,6 @@
                         "type": "string",
                         "description": "The date and time that the internal secret incident was detected",
                         "format": "date-time"
-                    },
-                    "detector": {
-                        "title": "Secret Detector Details",
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "title": "Detector Name",
-                                "type": "string",
-                                "description": "The Secret Detector name"
-                            },
-                            "displayName": {
-                                "title": "Detector Display Name",
-                                "type": "string",
-                                "description": "The Secret Detector display name"
-                            },
-                            "nature": {
-                                "title": "Detector Type",
-                                "type": "string",
-                                "description": "The type of Secret Detector",
-                                "enum": [
-                                    "specific",
-                                    "generic",
-                                    "custom"
-                                ]
-                            },
-                            "family": {
-                                "title": "Detector Family",
-                                "type": "string",
-                                "description": "The Secret Detector family"
-                            },
-                            "detectorGroupName": {
-                                "title": "Detector Group Name",
-                                "type": "string",
-                                "description": "The Secret Detector group name"
-                            },
-                            "detectorGroupDisplayName": {
-                                "title": "Detector Group Display Name",
-                                "type": "string",
-                                "description": "The Secret Detector group display name"
-                            }                            
-                        }
                     },
                     "secretId": {
                         "title": "Secret ID",

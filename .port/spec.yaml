@@ -1,5 +1,5 @@
 title: GitGuardian
-description: Git Guardian integration for Port Ocean
+description: GitGuardian integration for Port Ocean
 icon: Lock  # Should be one of the available icons in Port
 features:
   - type: exporter
