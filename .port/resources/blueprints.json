@@ -67,7 +67,7 @@
                 },
                 "openIncidentsSeverityBreakdown": {
                     "type": "object",
-                    "title": "Open Incidents Severity Breakdown",
+                    "title": "Open Incidents Sev Breakdown",
                     "properties": {
                         "critical": {
                             "title": "Total Incidents - Critical Severity",
@@ -103,7 +103,7 @@
                 },
                 "closedIncidentsSeverityBreakdown": {
                     "type": "object",
-                    "title": "Closed Incidents Severity Breakdown",
+                    "title": "Closed Incidents Sev Breakdown",
                     "properties": {
                         "critical": {
                             "title": "Total Incidents - Critical Severity",

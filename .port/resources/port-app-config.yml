@@ -5,30 +5,41 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id|tostring
-          title: '(.type + " - " + .full_name)'
+          identifier: .full_name | gsub(" "; "")
+          title: (.type + "-" + .full_name) | gsub(" "; "")
           blueprint: '"gitguardianSource"'
           properties:
-            id: .my_enum
             sourceType: .type
             fullName: .full_name
             url: .url
             health: .health
             sourceCriticality: .source_criticality
             openIncidentsCount: .open_incidents_count
-            openIncidentsSeverityBreakdown.critical: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
-            openIncidentsSeverityBreakdown.high: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
-            openIncidentsSeverityBreakdown.medium: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
-            openIncidentsSeverityBreakdown.low: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
-            openIncidentsSeverityBreakdown.info: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
-            openIncidentsSeverityBreakdown.unknown: .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
+            openIncidentsSeverityBreakdown.critical: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
+            openIncidentsSeverityBreakdown.high: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
+            openIncidentsSeverityBreakdown.medium: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
+            openIncidentsSeverityBreakdown.low: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
+            openIncidentsSeverityBreakdown.info: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
+            openIncidentsSeverityBreakdown.unknown: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
             closedIncidentsCount: .closed_incidents_count
-            closedIncidentsSeverityBreakdown.critical: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
-            closedIncidentsSeverityBreakdown.high: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
-            closedIncidentsSeverityBreakdown.medium: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
-            closedIncidentsSeverityBreakdown.low: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
-            closedIncidentsSeverityBreakdown.info: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
-            closedIncidentsSeverityBreakdown.unknown: .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
+            closedIncidentsSeverityBreakdown.critical: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
+            closedIncidentsSeverityBreakdown.high: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
+            closedIncidentsSeverityBreakdown.medium: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
+            closedIncidentsSeverityBreakdown.low: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
+            closedIncidentsSeverityBreakdown.info: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
+            closedIncidentsSeverityBreakdown.unknown: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
             lastScan.date: .last_scan.date
             lastScan.status: .last_scan.status
             lastScan.failingReason: .last_scan.failing_reason
@@ -66,11 +77,10 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id|tostring
-          title: (.id | tostring) + "-" + .detector.name
+          identifier: (.id | tostring) + "-" + .detector.name
+          title: .detector.display_name
           blueprint: '"gitguardianInternalIncident"'
           properties:
-            id: .id
             date: .date
             detector.name: .detector.name
             detector.displayName: .detector.display_name
@@ -96,11 +106,10 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id|tostring
-          title: (.id | tostring) + "-" + .detector.name
+          identifier: (.id | tostring) + "-" + .detector.name
+          title: .detector.display_name
           blueprint: '"gitguardianPublicIncident"'
           properties:
-            id: .id
             date: .date
             detector.name: .detector.name
             detector.displayName: .detector.display_name
@@ -127,11 +136,10 @@ resources:
     port:
       entity:
         mappings:
-          identifier: .id|tostring
+          identifier: .id | tostring
           title: .name
           blueprint: '"gitguardianUser"'
           properties:
-            id: .id
             name: .name
             email: .email
             accessLevel: .access_level
