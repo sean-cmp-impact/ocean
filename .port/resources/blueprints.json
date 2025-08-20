@@ -5,11 +5,6 @@
         "icon": "Code",
         "schema": {
             "properties": {
-                "id": {
-                    "title": "Source ID",
-                    "type": "string",
-                    "description": "The unique GitGuardian source ID"
-                },
                 "sourceType": {                    
                     "title": "Source Type",
                     "type": "string",
@@ -65,114 +60,106 @@
                     "type": "number",
                     "description": "The total number of open incidents of the GitGuardian source"
                 },
-                "openIncidentsSeverityBreakdown": {
-                    "type": "object",
-                    "title": "Open Incidents Sev Breakdown",
-                    "properties": {
-                        "critical": {
-                            "title": "Total Incidents - Critical Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with critical severity that are still open"
-                        },
-                        "high": {
-                            "title": "Total Incidents - High Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with high severity that are still open"
-                        },
-                        "medium": {
-                            "title": "Total Incidents - Medium Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with medium severity that are still open"
-                        },
-                        "low": {
-                            "title": "Total Incidents - Low Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with low severity that are still open"
-                        },
-                        "unknown": {
-                            "title": "Total Incidents - Unknown Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with an unknown severity that are still open"
-                        }
-                    }
-                }, 
+                "openCriticalIncidents": {
+                    "title": "Total Open Critical Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with critical severity that are still open"
+                },
+                "openHighIncidents": {
+                    "title": "Total Open High Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with high severity that are still open"
+                },
+                "openMediumIncidents": {
+                    "title": "Total Open Medium Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with medium severity that are still open"
+                },
+                "openLowIncidents": {
+                    "title": "Total Open Low Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with low severity that are still open"
+                },
+                "openInfoIncidents": {
+                    "title": "Total Open Info Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with info severity that are still open"
+                },
+                "openUnknownIncidents": {
+                    "title": "Total Open Unknown Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with an unknown severity that are still open"
+                },
                 "closedIncidentsCount": {
                     "title": "Closed Incident Count",
                     "type": "number",
                     "description": "The total number of closed incidents of the GitGuardian source"
                 },
-                "closedIncidentsSeverityBreakdown": {
-                    "type": "object",
-                    "title": "Closed Incidents Sev Breakdown",
-                    "properties": {
-                        "critical": {
-                            "title": "Total Incidents - Critical Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with critical severity that are closed"
-                        },
-                        "high": {
-                            "title": "Total Incidents - High Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with high severity that are closed"
-                        },
-                        "medium": {
-                            "title": "Total Incidents - Medium Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with medium severity that are closed"
-                        },
-                        "low": {
-                            "title": "Total Incidents - Low Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with low severity that are closed"
-                        },
-                        "unknown": {
-                            "title": "Total Incidents - Unknown Severity",
-                            "type": "number",
-                            "description": "The total number of incidents with an unknown severity that are closed"
-                        }
-                    }
+                "closedCriticalIncidents": {
+                    "title": "Closed Critical Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with critical severity that are closed"
                 },
-                "lastScan": {
-                    "type": "object",
-                    "title": "Closed Incidents Severity Breakdown",
-                    "properties": {
-                        "date": {
-                            "title": "Last Scan Date",
-                            "type": "string",
-                            "description": "The date this GitGuardian source was scanned",
-                            "format": "date-time"
-                        },
-                        "status": {                    
-                            "title": "Status of Scan",
-                            "type": "string",
-                            "description": "The status of the last scan "
-                        },
-                        "failingReason": {                    
-                            "title": "Failing Reason",
-                            "type": "string",
-                            "description": "The reason description of a possible scan failure"
-                        },
-                        "commitScanned": {
-                            "title": "Commits Scanned",
-                            "type": "number",
-                            "description": "The total number of commits scanned"
-                        },
-                        "duration": {
-                            "title": "Scan Duration",
-                            "type": "string",
-                            "description": "The total time in seconds that it took to complete the scan"
-                        },
-                        "branchesScanned": {
-                            "title": "Branches Scanned",
-                            "type": "number",
-                            "description": "The total number of branches scanned"
-                        },
-                        "progress": {
-                            "title": "Scan Progress",
-                            "type": "number",
-                            "description": "The progress of the scan"
-                        }
-                    }
+                "closedHighIncidents": {
+                    "title": "Closed High Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with high severity that are closed"
+                },
+                "closedMediumIncidents": {
+                    "title": "Closed Medium Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with medium severity that are closed"
+                },
+                "closedLowIncidents": {
+                    "title": "Closed Low Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with low severity that are closed"
+                },
+                "closedInfoIncidents": {
+                    "title": "Closed Info Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with info severity that are closed"
+                },
+                "closedUnknownIncidents": {
+                    "title": "Closed Unknown Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with an unknown severity that are closed"
+                },
+                "lastScanDate": {
+                    "title": "Last Scan Date",
+                    "type": "string",
+                    "description": "The date this GitGuardian source was scanned",
+                    "format": "date-time"
+                },
+                "lastScanStatus": {                    
+                    "title": "Status of Scan",
+                    "type": "string",
+                    "description": "The status of the last scan "
+                },
+                "lastScanFailingReason": {                    
+                    "title": "Failing Reason",
+                    "type": "string",
+                    "description": "The reason description of a possible scan failure"
+                },
+                "lastScanCommitScanned": {
+                    "title": "Commits Scanned",
+                    "type": "number",
+                    "description": "The total number of commits scanned"
+                },
+                "lastScanDuration": {
+                    "title": "Scan Duration",
+                    "type": "string",
+                    "description": "The total time in seconds that it took to complete the scan"
+                },
+                "lastScanBranchesScanned": {
+                    "title": "Branches Scanned",
+                    "type": "number",
+                    "description": "The total number of branches scanned"
+                },
+                "lastScanProgress": {
+                    "title": "Scan Progress",
+                    "type": "number",
+                    "description": "The progress of the scan"
                 },
                 "visibility": {
                     "title": "Source Visibility",
@@ -235,7 +222,7 @@
                     "description": "Indicates if the Secret Detector is checkable"
                 },
                 "useWithValidityCheckDisabled": {
-                    "title": "Use With Validity Check Disabled",
+                    "title": "Use With No Validity Check",
                     "type": "boolean",
                     "description": "Indicates if the Secret Detector can be used with validity check disabled"
                 },
@@ -276,11 +263,6 @@
         "icon": "Alert",
         "schema": {
             "properties": {
-                    "id": {
-                        "title": "Incident ID",
-                        "type": "string",
-                        "description": "The unique internal secret incident ID"
-                    },
                     "date": {
                         "title": "Incident Detection Date",
                         "type": "string",
@@ -422,11 +404,6 @@
         "icon": "Alert",
         "schema": {
             "properties": {
-                    "id": {
-                        "title": "Incident ID",
-                        "type": "string",
-                        "description": "The unique internal secret incident ID"
-                    },
                     "date": {
                         "title": "Incident Detection Date",
                         "type": "string",
@@ -565,7 +542,14 @@
             },
             "required": []
         },
-        "relations": {}
+        "relations": {
+            "detector": {
+                "title": "Detector",
+                "target": "gitguardianSecretDetector",
+                "required": false,
+                "many": false
+            }
+        }
     },    
     {
         "identifier": "gitguardianUser",
@@ -573,11 +557,6 @@
         "icon": "User",
         "schema": {
             "properties": {
-                    "id": {
-                        "title": "User ID",
-                        "type": "string",
-                        "description": "The unique GitGuardian user/workspace member ID"
-                    },
                     "name": {
                         "title": "User Name",
                         "type": "string",
