@@ -29,4 +29,4 @@ This integration provides the following resources:
 
 #### Install & use the integration - [Integration documentation](https://docs.port.io/build-your-software-catalog/sync-data-to-catalog/)
 
-#### Develop & improve the integration - [Ocean integration development documentation](https://ocean.getport.io/develop-an-integration/)
+#### Develop & improve the integration - [Ocean integration development documentation](https://ocean.port.io/developing-an-integration/)
