@@ -42,7 +42,7 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
 
         computed_signature = hmac.new(
             key=bytes(timestamp + webhook_secret, "utf-8"),
-            msg=bytes(str(payload), "utf-8"),
+            msg=bytes(payload, "utf-8"),
             digestmod=hashlib.sha256,
         ).hexdigest()
 
