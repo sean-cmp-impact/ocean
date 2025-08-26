@@ -11,6 +11,7 @@ from port_ocean.core.handlers.webhook.webhook_event import (
     WebhookEvent,
     WebhookEventRawResults,
 )
+from webhook_processors.webhook_events import WEBHOOK_EVENTS
 
 
 class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
@@ -18,11 +19,7 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         if event._original_request is None:
             return False
 
-        body = await event._original_request.body()
-        payload = body.decode("utf-8")
-        headers = event.headers
-
-        return await self._verify_payload_signature(payload, headers)
+        return event.payload.get("action") in WEBHOOK_EVENTS
 
     async def _verify_payload_signature(
         self, payload: str, headers: dict[str, Any]
