@@ -93,9 +93,15 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
         "data": get_single_mocked_source(source_id, "test_repo")
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.return_value = source_data
         result = await mock_gitguardian_client.get_single_source(source_id)
 
@@ -108,7 +114,7 @@ async def test_get_single_source(mock_gitguardian_client: GitGuardianClient) -> 
 @pytest.mark.asyncio
 async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_sources method"""
-    next_endpoint = f"v1/{Endpoints.SOURCES}?cursor={CURSOR}&per_page=50"
+    next_endpoint = f"{Endpoints.SOURCES}?cursor={CURSOR}&per_page=50"
     sources_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_source(1234, "test_repo")}",
@@ -116,15 +122,21 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
         ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "url": f"{next_endpoint}",
                 "rel": "next",
             }
         },
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.side_effect = [sources_response, EMPTY_RESPONSE]
 
         sources = []
@@ -134,7 +146,7 @@ async def test_get_sources(mock_gitguardian_client: GitGuardianClient) -> None:
         assert len(sources) == 2
         assert sources == sources_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}",
+            endpoint=f"{next_endpoint}",
             method="GET",
             query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
@@ -148,9 +160,15 @@ async def test_get_single_user(
     user_id = 3252
     user_data: dict[str, Any] = {"data": get_single_mocked_user(user_id, "John Doe")}
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.return_value = user_data
         result = await mock_gitguardian_client.get_single_user(user_id)
 
@@ -161,7 +179,7 @@ async def test_get_single_user(
 @pytest.mark.asyncio
 async def test_get_users(mock_gitguardian_client: GitGuardianClient) -> None:
     """Test get_users method"""
-    next_endpoint = f"v1/{Endpoints.USERS}?cursor={CURSOR}&per_page=50"
+    next_endpoint = f"{Endpoints.USERS}?cursor={CURSOR}&per_page=50"
     members_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_user(1234, "John Doe")}",
@@ -169,15 +187,21 @@ async def test_get_users(mock_gitguardian_client: GitGuardianClient) -> None:
         ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "url": f"{next_endpoint}",
                 "rel": "next",
             }
         },
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.side_effect = [members_response, EMPTY_RESPONSE]
 
         members = []
@@ -187,7 +211,7 @@ async def test_get_users(mock_gitguardian_client: GitGuardianClient) -> None:
         assert len(members) == 2
         assert members == members_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}",
+            endpoint=f"{next_endpoint}",
             method="GET",
             query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
@@ -205,9 +229,15 @@ async def test_get_single_internal_secret_incident(
         )
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.return_value = secret_incident_data
         result = await mock_gitguardian_client.get_single_internal_secret_incidents(
             incident_id
@@ -224,9 +254,7 @@ async def test_get_internal_secret_incidents(
     mock_gitguardian_client: GitGuardianClient,
 ) -> None:
     """Test get_internal_secret_incidents method"""
-    next_endpoint = (
-        f"v1/{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
-    )
+    next_endpoint = f"{Endpoints.INTERNAL_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
     internal_incidents_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_internal_secret_incident(1234, "slackbot_token", "Slack Bot Token")}",
@@ -234,15 +262,21 @@ async def test_get_internal_secret_incidents(
         ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "url": f"{next_endpoint}",
                 "rel": "next",
             }
         },
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.side_effect = [internal_incidents_response, EMPTY_RESPONSE]
 
         internal_incidents = []
@@ -254,7 +288,7 @@ async def test_get_internal_secret_incidents(
         assert len(internal_incidents) == 2
         assert internal_incidents == internal_incidents_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}",
+            endpoint=f"{next_endpoint}",
             method="GET",
             query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
@@ -272,9 +306,15 @@ async def test_get_single_public_secret_incident(
         )
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.return_value = public_secret_incident_data
         result = await mock_gitguardian_client.get_single_public_secret_incidents(
             incident_id
@@ -291,9 +331,7 @@ async def test_get_public_secret_incidents(
     mock_gitguardian_client: GitGuardianClient,
 ) -> None:
     """Test get_public_secret_incidents method"""
-    next_endpoint = (
-        f"v1/{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
-    )
+    next_endpoint = f"{Endpoints.PUBLIC_SECRET_INCIDENTS}?cursor={CURSOR}&per_page=50"
     public_incidents_response: dict[str, list[dict[str, Any]]] = {
         "data": [
             f"{get_single_mocked_public_secret_incident(1234, "slackbot_token", "Slack Bot Token")}",
@@ -301,15 +339,21 @@ async def test_get_public_secret_incidents(
         ],
         "links": {
             "next": {
-                "url": f"https://mockapi.gitguardian.com/{next_endpoint}",
+                "url": f"{next_endpoint}",
                 "rel": "next",
             }
         },
     }
 
-    with patch.object(
-        mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
-    ) as mock_request:
+    with (
+        patch.object(
+            mock_gitguardian_client, "_send_api_request", new_callable=AsyncMock
+        ) as mock_request,
+        patch.object(
+            mock_gitguardian_client, "_has_scopes", new_callable=AsyncMock
+        ) as mock_scopes,
+    ):
+        mock_scopes.return_value = True
         mock_request.side_effect = [public_incidents_response, EMPTY_RESPONSE]
 
         public_incidents = []
@@ -321,7 +365,7 @@ async def test_get_public_secret_incidents(
         assert len(public_incidents) == 2
         assert public_incidents == public_incidents_response["data"]
         mock_request.assert_called_with(
-            endpoint=f"/{next_endpoint}",
+            endpoint=f"{next_endpoint}",
             method="GET",
             query_params={"cursor": f"{CURSOR}", "per_page": PAGE_SIZE},
         )
