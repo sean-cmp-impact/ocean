@@ -1,9 +1,10 @@
 import httpx
-from httpx import URL, Response
+from httpx import URL
 from enum import StrEnum
 from typing import AsyncGenerator, Optional, Any
 from port_ocean.utils import http_async_client
 from loguru import logger
+from integration import ObjectKind
 
 PAGE_SIZE = 50
 
@@ -15,6 +16,15 @@ class Endpoints(StrEnum):
     PUBLIC_SECRET_INCIDENTS = "public-incidents/secrets"
     SOURCES = "sources"
     SECRET_DETECTORS = "secret_detectors"
+    API_TOKENS = "api_tokens/self"
+
+
+class ApiScopes(StrEnum):
+    INCIDENTS_READ = "incidents:read"
+    PUBLIC_PERIMETER_READ = "public-perimeter:read"
+    SOURCES_READ = "sources:read"
+    SECRET_DETECTOR_READ = "secret_detector:read"
+    MEMBERS_READ = "members:read"
 
 
 class GitGuardianClient:
@@ -89,8 +99,8 @@ class GitGuardianClient:
                 next_url = links.get("next", {}).get("url")
                 if next_url:
                     parsed_url = URL(next_url)
-                    endpoint = parsed_url.raw_path.decode().replace(
-                        f"{self.base_url}/{self.api_version}", ""
+                    endpoint = next_url.replace(
+                        f"{self.base_url}/{self.api_version}/", ""
                     )
                     query_params = dict(parsed_url.params)
                 else:
@@ -102,13 +112,28 @@ class GitGuardianClient:
                 )
                 raise
 
-    async def get_health(self) -> dict[str, Any]:
-        logger.info(f"Checking the status of the API and token.")
-        return await self._send_api_request(endpoint=Endpoints.HEALTH)
+    async def _get_token_detail(self) -> dict[str, Any]:
+        result = await self._send_api_request(endpoint=f"{Endpoints.API_TOKENS}")
+        return result.get("data")
+
+    async def _has_scopes(self, scopes: list[ApiScopes], kind: ObjectKind) -> bool:
+        token_details = await self._get_token_detail()
+        token_scopes = token_details.get("scopes", [])
+        has_scopes = all(scope.value in token_scopes for scope in scopes)
+        if not has_scopes:
+            logger.warning(
+                f"Insufficient scope on the configured GitGuardian API token to obtain data for the {kind.value} kind."
+            )
+        return has_scopes
 
     async def get_internal_secret_incidents(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
+        if not await self._has_scopes(
+            [ApiScopes.INCIDENTS_READ], ObjectKind.INTERNAL_SECRET_INCIDENT
+        ):
+            return
+
         logger.info(f"Fetching secret incidents detected by the GitGuardian dashboard.")
         async for incidents in self._send_paginated_request(
             endpoint=Endpoints.INTERNAL_SECRET_INCIDENTS, query_params=query_params
@@ -118,6 +143,11 @@ class GitGuardianClient:
     async def get_single_internal_secret_incidents(
         self, incident_id: int
     ) -> dict[str, Any]:
+        if not await self._has_scopes(
+            [ApiScopes.INCIDENTS_READ], ObjectKind.INTERNAL_SECRET_INCIDENT
+        ):
+            return
+
         logger.info(
             f"Fetching specific secret incidents detected by the GitGuardian dashboard."
         )
@@ -129,6 +159,9 @@ class GitGuardianClient:
     async def get_users(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
+        if not await self._has_scopes([ApiScopes.MEMBERS_READ], ObjectKind.USER):
+            return
+
         logger.info(f"Fetching all members of the GitGuardian workspace.")
         async for members in self._send_paginated_request(
             endpoint=Endpoints.USERS, query_params=query_params
@@ -136,6 +169,9 @@ class GitGuardianClient:
             yield members
 
     async def get_single_user(self, user_id: int) -> dict[str, Any]:
+        if not await self._has_scopes([ApiScopes.MEMBERS_READ], ObjectKind.USER):
+            return
+
         logger.info(f"Fetching specific GitGuardian user.")
         result = await self._send_api_request(endpoint=f"{Endpoints.USERS}/{user_id}")
         return result.get("data")
@@ -143,6 +179,12 @@ class GitGuardianClient:
     async def get_public_secret_incidents(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
+        if not await self._has_scopes(
+            [ApiScopes.INCIDENTS_READ, ApiScopes.PUBLIC_PERIMETER_READ],
+            ObjectKind.PUBLIC_SECRET_INCIDENT,
+        ):
+            return
+
         logger.info(
             f"Fetching public secret incidents detected by the GitGuardian dashboard."
         )
@@ -154,6 +196,12 @@ class GitGuardianClient:
     async def get_single_public_secret_incidents(
         self, incident_id: int
     ) -> dict[str, Any]:
+        if not await self._has_scopes(
+            [ApiScopes.INCIDENTS_READ, ApiScopes.PUBLIC_PERIMETER_READ],
+            ObjectKind.PUBLIC_SECRET_INCIDENT,
+        ):
+            return
+
         logger.info(
             f"Fetching specific public secret incidents detected by the GitGuardian dashboard."
         )
@@ -165,6 +213,9 @@ class GitGuardianClient:
     async def get_sources(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
+        if not await self._has_scopes([ApiScopes.SOURCES_READ], ObjectKind.SOURCE):
+            return
+
         logger.info(f"Fetching all sources known by GitGuardian.")
         async for sources in self._send_paginated_request(
             endpoint=Endpoints.SOURCES, query_params=query_params
@@ -172,24 +223,23 @@ class GitGuardianClient:
             yield sources
 
     async def get_single_source(self, source_id: int) -> dict[str, Any]:
+        if not await self._has_scopes([ApiScopes.SOURCES_READ], ObjectKind.SOURCE):
+            return
+
         logger.info(f"Fetching a single source known by GitGuardian.")
         result = await self._send_api_request(
             endpoint=f"{Endpoints.SOURCES}/{source_id}"
         )
         return result.get("data")
 
-    async def get_sources_secret_incidents(
-        self, source_id: int
-    ) -> AsyncGenerator[list[dict[str, Any]], None]:
-        logger.info(f"Fetching secret incidents linked to a source.")
-        async for source_incidents in self._send_paginated_request(
-            endpoint=f"{Endpoints.SOURCES}/{source_id}/incidents/secrets"
-        ):
-            yield source_incidents
-
     async def get_secret_detectors(
         self, query_params: Optional[dict[str, Any]] = None
     ) -> AsyncGenerator[list[dict[str, Any]], None]:
+        if not await self._has_scopes(
+            [ApiScopes.INCIDENTS_READ], ObjectKind.SECRET_DETECTOR
+        ):
+            return
+
         logger.info(f"Fetching all secret detectors.")
         async for detectors in self._send_paginated_request(
             endpoint=Endpoints.SECRET_DETECTORS, query_params=query_params
