@@ -18,18 +18,24 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
         if event._original_request is None:
             return False
 
-        return await self._verify_payload_signature(event)
+        body = await event._original_request.body()
+        payload = body.decode("utf-8")
+        headers = event.headers
 
-    async def _verify_payload_signature(self, event: WebhookEvent) -> bool:
+        return await self._verify_payload_signature(payload, headers)
+
+    async def _verify_payload_signature(
+        self, payload: str, headers: dict[str, Any]
+    ) -> bool:
         # See https://docs.gitguardian.com/platform/configure-alerting/notifiers-integrations/custom-webhook
-        signature = event.headers.get("gitguardian-signature", "")
+        signature = headers.get("gitguardian-signature", "")
 
         if not signature.startswith("sha256="):
             return False
 
         signature = signature.split("sha256=")[-1]
-        webhook_secret = ocean.integration_config.get("webhook_secret")
-        timestamp = event.headers.get("timestamp", "")
+        webhook_secret = ocean.integration_config.get("gitguardian_webhook_secret")
+        timestamp = headers.get("timestamp", "")
 
         if webhook_secret is None:
             logger.warning(
@@ -37,12 +43,10 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
             )
             return False
 
-        # Verify signature if webhook secret configured
-        body = await event._original_request.body()
         computed_signature = hmac.new(
-            bytes(f"{timestamp}{webhook_secret}", "utf-8"),
-            body,
-            hashlib.sha256,
+            key=bytes(timestamp + webhook_secret, "utf-8"),
+            msg=bytes(str(payload), "utf-8"),
+            digestmod=hashlib.sha256,
         ).hexdigest()
 
         return hmac.compare_digest(signature, computed_signature)
@@ -50,16 +54,10 @@ class BaseGitGuardianWebhookProcessor(AbstractWebhookProcessor):
     async def authenticate(
         self, payload: EventPayload, headers: dict[str, Any]
     ) -> bool:
-        # This method only checks for the presence of required headers and webhook secret.
-        # Actual signature verification is performed in should_process_event.
-        # See https://ocean.port.io/developing-an-integration/implementing-webhooks/
-        webhook_secret_configured = (
-            ocean.integration_config.get("webhook_secret") is not None
-        )
-        has_required_headers = (
-            "gitguardian-signature" in headers and "timestamp" in headers
-        )
-        return webhook_secret_configured and has_required_headers
+        if not payload:
+            return False
+
+        await self._verify_payload_signature(str(payload), headers)
 
     def _empty_response(self, log_message: str) -> WebhookEventRawResults:
         logger.warning(log_message)
