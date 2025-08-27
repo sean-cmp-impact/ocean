@@ -1,39 +1,601 @@
 [
     {
-        "identifier": "gitguardianExampleBlueprint",
-        "title": "gitGuardian Example",
-        "icon": "Blueprint",
+        "identifier": "gitguardianSource",
+        "title": "GitGuardian Source",
+        "icon": "Code",
         "schema": {
             "properties": {
-                "status": {
+                "sourceType": {                    
+                    "title": "Source Type",
                     "type": "string",
+                    "description": "The GitGuardian source type"
+                },
+                "fullName": {                    
+                    "title": "Source Name",                    
+                    "type": "string",
+                    "description": "The full name of the GitGuardian source"
+                },
+                "url": {
+                    "title": "Project URL",
+                    "type": "string",
+                    "format": "url",
+                    "description": "URL to the GitGuardian source"
+                },
+                "health": {
+                    "title": "Source Health",
+                    "type": "string",
+                    "description": "The health of the GitGuardian source",
                     "enum": [
-                        "VALID",
-                        "FAILED"
+                        "safe",
+                        "unknown",
+                        "at_risk"
                     ],
                     "enumColors": {
-                        "VALID": "green",
-                        "FAILED": "red"
-                    },
-                    "title": "Status"
+                        "safe": "green",
+                        "unknown": "yellow",
+                        "at_risk": "red"
+                    }
                 },
-                "text": {
+                "sourceCriticality": {
+                    "title": "Source Criticality",
                     "type": "string",
-                    "title": "Text"
+                    "description": "The criticality of the GitGuardian source",
+                    "enum": [
+                        "critical",
+                        "high",
+                        "medium",
+                        "low",
+                        "unknown"
+                    ],
+                    "enumColors": {
+                        "low": "green",
+                        "unknown": "yellow",
+                        "medium": "orange",
+                        "high": "red",
+                        "critical": "red"
+                    }
                 },
-                "component": {
-                    "type": "string",
-                    "title": "Component"
-                },
-                "service": {
-                    "type": "string",
-                    "title": "Service"
-                },
-                "score": {
+                "openIncidentsCount": {
+                    "title": "Open Incident Count",
                     "type": "number",
-                    "title": "Score"
+                    "description": "The total number of open incidents of the GitGuardian source"
+                },
+                "openCriticalIncidents": {
+                    "title": "Total Open Critical Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with critical severity that are still open"
+                },
+                "openHighIncidents": {
+                    "title": "Total Open High Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with high severity that are still open"
+                },
+                "openMediumIncidents": {
+                    "title": "Total Open Medium Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with medium severity that are still open"
+                },
+                "openLowIncidents": {
+                    "title": "Total Open Low Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with low severity that are still open"
+                },
+                "openInfoIncidents": {
+                    "title": "Total Open Info Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with info severity that are still open"
+                },
+                "openUnknownIncidents": {
+                    "title": "Total Open Unknown Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with an unknown severity that are still open"
+                },
+                "closedIncidentsCount": {
+                    "title": "Closed Incident Count",
+                    "type": "number",
+                    "description": "The total number of closed incidents of the GitGuardian source"
+                },
+                "closedCriticalIncidents": {
+                    "title": "Closed Critical Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with critical severity that are closed"
+                },
+                "closedHighIncidents": {
+                    "title": "Closed High Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with high severity that are closed"
+                },
+                "closedMediumIncidents": {
+                    "title": "Closed Medium Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with medium severity that are closed"
+                },
+                "closedLowIncidents": {
+                    "title": "Closed Low Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with low severity that are closed"
+                },
+                "closedInfoIncidents": {
+                    "title": "Closed Info Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with info severity that are closed"
+                },
+                "closedUnknownIncidents": {
+                    "title": "Closed Unknown Incidents",
+                    "type": "number",
+                    "description": "The total number of incidents with an unknown severity that are closed"
+                },
+                "lastScanDate": {
+                    "title": "Last Scan Date",
+                    "type": "string",
+                    "description": "The date this GitGuardian source was scanned",
+                    "format": "date-time"
+                },
+                "lastScanStatus": {                    
+                    "title": "Status of Scan",
+                    "type": "string",
+                    "description": "The status of the last scan "
+                },
+                "lastScanFailingReason": {                    
+                    "title": "Failing Reason",
+                    "type": "string",
+                    "description": "The reason description of a possible scan failure"
+                },
+                "lastScanCommitScanned": {
+                    "title": "Commits Scanned",
+                    "type": "number",
+                    "description": "The total number of commits scanned"
+                },
+                "lastScanDuration": {
+                    "title": "Scan Duration",
+                    "type": "string",
+                    "description": "The total time in seconds that it took to complete the scan"
+                },
+                "lastScanBranchesScanned": {
+                    "title": "Branches Scanned",
+                    "type": "number",
+                    "description": "The total number of branches scanned"
+                },
+                "lastScanProgress": {
+                    "title": "Scan Progress",
+                    "type": "number",
+                    "description": "The progress of the scan"
+                },
+                "visibility": {
+                    "title": "Source Visibility",
+                    "type": "string",
+                    "description": "The visibility of the GitGuardian source",
+                    "enum": [
+                        "private",
+                        "public"
+                    ]
+                }         
+            },
+            "required": []
+        },
+        "relations": {}
+    },
+    {
+        "identifier": "gitguardianSecretDetector",
+        "title": "GitGuardian Secret Detector",
+        "icon": "ManageSearch",
+        "schema": {
+            "properties": {
+                "name": {
+                    "title": "Detector Name",
+                    "type": "string",
+                    "description": "The name of the Secret Detector"
+                },
+                "displayName": {
+                    "title": "Detector Display Name",
+                    "type": "string",
+                    "description": "The display name of the Secret Detector"
+                },
+                "type": {
+                    "title": "Detector Type",
+                    "type": "string",
+                    "description": "The type of Secret Detector",
+                    "enum": [
+                        "specific",
+                        "generic",
+                        "custom"
+                    ]
+                }, 
+                "category": {
+                    "title": "Detector Category",
+                    "type": "string",
+                    "description": "The Secret Detector category"
+                },       
+                "isActive": {
+                    "title": "Detector Active",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector is active or not"
+                },
+                "scansCodeOnly": {
+                    "title": "Scans Code Only",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector only scans code"
+                },
+                "checkable": {
+                    "title": "Checkable",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector is checkable"
+                },
+                "useWithValidityCheckDisabled": {
+                    "title": "Use With No Validity Check",
+                    "type": "boolean",
+                    "description": "Indicates if the Secret Detector can be used with validity check disabled"
+                },
+                "frequency": {
+                    "title": "Detector Frequency",
+                    "type": "string",
+                    "description": "The Secret Detector frequency"
+                }, 
+                "removedAt": {
+                    "title": "Removed At",
+                    "type": "string",
+                    "description": "The date and time that the Secret Detector was removed",
+                    "format": "date-time"
+                },
+                "openIncidentsCount": {
+                    "title": "Open Incidents Count",
+                    "type": "number",
+                    "description": "The total number of open incidents for this Secret Detector"
+                },
+                "ignoredIncidentsCount": {
+                    "title": "Ignored Incidents Count",
+                    "type": "number",
+                    "description": "The total number of ignored incidents for this Secret Detector"
+                },
+                "resolvedIncidentsCount": {
+                    "title": "Resolved Incidents Count",
+                    "type": "number",
+                    "description": "The total number of resolved incidents for this Secret Detector"
                 }
             },
+            "required": []
+        },
+        "relations": {}
+    },
+    {
+        "identifier": "gitguardianInternalIncident",
+        "title": "Internal Secret Incident",
+        "icon": "Alert",
+        "schema": {
+            "properties": {
+                    "date": {
+                        "title": "Incident Detection Date",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was detected",
+                        "format": "date-time"
+                    },                    
+                    "secretId": {
+                        "title": "Secret ID",
+                        "type": "number",
+                        "description": "The unique secret ID"
+                    },
+                    "gitguardianUrl": {
+                        "title": "Incident URL",
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to incident in GitGuardian"
+                    },
+                    "regression": {
+                        "title": "Regression",
+                        "type": "boolean",
+                        "description": "Indicates if it is a regression"
+                    },
+                    "status": {
+                        "title": "Incident Status",
+                        "type": "string",
+                        "description": "The status of the internal secret incident",
+                        "enum": [
+                            "IGNORED",
+                            "TRIGGERED",
+                            "ASSIGNED",
+                            "RESOLVED"
+                        ]
+                    },
+                    "occurrencesCount": {
+                        "title": "Incident Occurrences",
+                        "type": "number",
+                        "description": "The amount of times this specific internal secret incident was detected"
+                    },
+                    "ignoreReason": {
+                        "title": "Ignore Reason",
+                        "type": "string",
+                        "description": "The reason an internal secret incident was ignored"
+                    },
+                    "ignoredAt": {
+                        "title": "Ignore At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was ignored",
+                        "format": "date-time"
+                    },
+                    "secretRevoked": {
+                        "title": "Secret Revoked",
+                        "type": "boolean",
+                        "description": "Indicates if the secret has been revoked or not"
+                    },
+                    "severity": {
+                        "title": "Incident Severity",
+                        "type": "string",
+                        "description": "The severity of the internal secret incident",
+                        "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info",
+                            "unknown"
+                        ],
+                        "enumColors": {
+                            "low": "green",
+                            "unknown": "yellow",
+                            "info": "yellow",
+                            "medium": "orange",
+                            "high": "red",
+                            "critical": "red"
+                        }
+                    },
+                    "validity": {
+                        "title": "Incident Validity",
+                        "type": "string",
+                        "description": "The validity of the internal secret incident",
+                        "enum": [
+                            "valid",
+                            "invalid",
+                            "failed_to_check",
+                            "no_checker",
+                            "unknown"
+                        ]
+                    },
+                    "resolvedAt": {
+                        "title": "Resolved At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was resolved",
+                        "format": "date-time"
+                    },
+                    "shareUrl": {
+                        "title": "Share URL",
+                        "type": "string",
+                        "format": "url"
+                    },
+                    "custom_tags": {
+                        "title": "Custom Tags",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Custom Tags",
+                            "properties": {
+                                "id": {
+                                    "title": "Custom Tag ID",
+                                    "type": "string",
+                                    "description": "The unique custom tag ID"
+                                },
+                                "key": {
+                                    "title": "Custom Tag Key",
+                                    "type": "string",
+                                    "description": "The unique custom tag key"
+                                },
+                                "value": {
+                                    "title": "Custom Tag Value",
+                                    "type": "string",
+                                    "description": "The unique custom tag value"
+                                }
+                            }
+                        }
+                    }
+                },
+            "required": []
+        },
+        "relations": {
+            "detector": {
+                "title": "Detector",
+                "target": "gitguardianSecretDetector",
+                "required": false,
+                "many": false
+            }
+        }
+    },   
+    {
+        "identifier": "gitguardianPublicIncident",
+        "title": "Public Secret Incident",
+        "icon": "Alert",
+        "schema": {
+            "properties": {
+                    "date": {
+                        "title": "Incident Detection Date",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was detected",
+                        "format": "date-time"
+                    },
+                    "secretId": {
+                        "title": "Secret ID",
+                        "type": "number",
+                        "description": "The unique secret ID"
+                    },
+                    "gitguardianUrl": {
+                        "title": "Incident URL",
+                        "type": "string",
+                        "format": "url",
+                        "description": "URL to incident in GitGuardian"
+                    },
+                    "regression": {
+                        "title": "Regression",
+                        "type": "boolean",
+                        "description": "Indicates if it is a regression"
+                    },
+                    "status": {
+                        "title": "Incident Status",
+                        "type": "string",
+                        "description": "The status of the internal secret incident",
+                        "enum": [
+                            "IGNORED",
+                            "TRIGGERED",
+                            "ASSIGNED",
+                            "RESOLVED"
+                        ]
+                    },
+                    "occurrencesCount": {
+                        "title": "Incident Occurrences",
+                        "type": "number",
+                        "description": "The amount of times this specific internal secret incident was detected"
+                    },
+                    "ignoreReason": {
+                        "title": "Ignore Reason",
+                        "type": "string",
+                        "description": "The reason an internal secret incident was ignored"
+                    },
+                    "ignoredAt": {
+                        "title": "Ignore At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was ignored",
+                        "format": "date-time"
+                    },
+                    "secretRevoked": {
+                        "title": "Secret Revoked",
+                        "type": "boolean",
+                        "description": "Indicates if the secret has been revoked or not"
+                    },
+                    "severity": {
+                        "title": "Incident Severity",
+                        "type": "string",
+                        "description": "The severity of the internal secret incident",
+                        "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info",
+                            "unknown"
+                        ],
+                        "enumColors": {
+                            "low": "green",
+                            "unknown": "yellow",
+                            "info": "yellow",
+                            "medium": "orange",
+                            "high": "red",
+                            "critical": "red"
+                        }
+                    },
+                    "validity": {
+                        "title": "Incident Validity",
+                        "type": "string",
+                        "description": "The validity of the internal secret incident",
+                        "enum": [
+                            "valid",
+                            "invalid",
+                            "failed_to_check",
+                            "no_checker",
+                            "unknown"
+                        ]
+                    },
+                    "resolvedAt": {
+                        "title": "Resolved At",
+                        "type": "string",
+                        "description": "The date and time that the internal secret incident was resolved",
+                        "format": "date-time"
+                    },
+                    "shareUrl": {
+                        "title": "Share URL",
+                        "type": "string",
+                        "format": "url"
+                    },
+                    "custom_tags": {
+                        "title": "Custom Tags",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "title": "Custom Tags",
+                            "properties": {
+                                "id": {
+                                    "title": "Custom Tag ID",
+                                    "type": "string",
+                                    "description": "The unique custom tag ID"
+                                },
+                                "key": {
+                                    "title": "Custom Tag Key",
+                                    "type": "string",
+                                    "description": "The unique custom tag key"
+                                },
+                                "value": {
+                                    "title": "Custom Tag Value",
+                                    "type": "string",
+                                    "description": "The unique custom tag value"
+                                }
+                            }
+                        }
+                    },
+                    "declarative_secret_status": {
+                    "title": "Declarative Secret Status",
+                    "type": "string",
+                    "description": "The declarative status of the secret",
+                    "enum": [
+                        "revoked",
+                        "active",
+                        "test_credential",
+                        "false_positive",
+                        "low_risk"
+                    ]   
+                }             
+            },
+            "required": []
+        },
+        "relations": {
+            "detector": {
+                "title": "Detector",
+                "target": "gitguardianSecretDetector",
+                "required": false,
+                "many": false
+            }
+        }
+    },    
+    {
+        "identifier": "gitguardianUser",
+        "title": "GitGuardian User",
+        "icon": "User",
+        "schema": {
+            "properties": {
+                    "name": {
+                        "title": "User Name",
+                        "type": "string",
+                        "description": "The name of the user/workspace member"
+                    },
+                    "email": {
+                        "title": "User Email",
+                        "type": "string",
+                        "description": "The email address of the user/workspace member"
+                    },
+                    "accessLevel": {
+                        "title": "Access Level",
+                        "type": "string",
+                        "description": "The level of access that the user/workspace member has",
+                        "enum": [
+                            "owner",
+                            "manager",
+                            "member",
+                            "restricted"
+                        ]
+                    },
+                    "active": {
+                        "title": "Active",
+                        "type": "boolean",
+                        "description": "Indicates if the member is active or not"
+                    },
+                    "createdAt": {
+                        "title": "Created At",
+                        "type": "string",
+                        "description": "The date and time the user/workspace member was created",
+                        "format": "date-time"
+                    },
+                    "lastLogin": {
+                        "title": "Last Login",
+                        "type": "string",
+                        "description": "The date and time the user/workspace member has last logged into GitGuardian",
+                        "format": "date-time"
+                    }
+                },
             "required": []
         },
         "relations": {}

@@ -1,56 +1,98 @@
-from typing import Any
-
+from typing import cast
+from loguru import logger
 from port_ocean.context.ocean import ocean
+from gitguardian.overrides import (
+    GitGuardianInternalSecretIncidentConfig,
+    GitGuardianPublicSecretIncidentConfig,
+    GitGuardianSecretDetectorConfig,
+    GitGuardianSourceConfig,
+    GitGuardianUserConfig,
+)
+from initialize_client import init_gitguardian_client
+from port_ocean.context.event import event
+from port_ocean.core.ocean_types import ASYNC_GENERATOR_RESYNC_TYPE
+from integration import ObjectKind
+from webhook_processors.internal_incident_webhook_processor import (
+    InternalSecretIncidentWebhookProcessor,
+)
+from webhook_processors.public_incident_webhook_processor import (
+    PublicSecretIncidentWebhookProcessor,
+)
 
 
-# Required
-# Listen to the resync event of all the kinds specified in the mapping inside port.
-# Called each time with a different kind that should be returned from the source system.
-@ocean.on_resync()
-async def on_resync(kind: str) -> list[dict[Any, Any]]:
-    # 1. Get all data from the source system
-    # 2. Return a list of dictionaries with the raw data of the state to run the core logic of the framework for
-    # Example:
-    # if kind == "project":
-    #     return [{"some_project_key": "someProjectValue", ...}]
-    # if kind == "issues":
-    #     return [{"some_issue_key": "someIssueValue", ...}]
-
-    # Initial stub to show complete flow, replace this with your own logic
-    if kind == "gitguardian-example-kind":
-        return [
-            {
-                "my_custom_id": f"id_{x}",
-                "my_custom_text": f"very long text with {x} in it",
-                "my_special_score": x * 32 % 3,
-                "my_component": f"component-{x}",
-                "my_service": f"service-{x %2}",
-                "my_enum": "VALID" if x % 2 == 0 else "FAILED",
-            }
-            for x in range(25)
-        ]
-
-    return []
-
-
-# The same sync logic can be registered for one of the kinds that are available in the mapping in port.
-# @ocean.on_resync('project')
-# async def resync_project(kind: str) -> list[dict[Any, Any]]:
-#     # 1. Get all projects from the source system
-#     # 2. Return a list of dictionaries with the raw data of the state
-#     return [{"some_project_key": "someProjectValue", ...}]
-#
-# @ocean.on_resync('issues')
-# async def resync_issues(kind: str) -> list[dict[Any, Any]]:
-#     # 1. Get all issues from the source system
-#     # 2. Return a list of dictionaries with the raw data of the state
-#     return [{"some_issue_key": "someIssueValue", ...}]
-
-
-# Optional
-# Listen to the start event of the integration. Called once when the integration starts.
 @ocean.on_start()
 async def on_start() -> None:
-    # Something to do when the integration starts
-    # For example create a client to query 3rd party services - GitHub, Jira, etc...
-    print("Starting gitguardian integration")
+    logger.info("Starting GitGuardian integration")
+    if ocean.event_listener_type == "ONCE":
+        logger.info("Skipping webhook creation because the event listener is ONCE")
+        return
+
+
+@ocean.on_resync(ObjectKind.SOURCE)
+async def on_resync_sources(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianSourceConfig, event.resource_config).selector
+
+    async for sources in gitguardian_client.get_sources(
+        selector.produce_query_params()
+    ):
+        logger.info(f"Received source batch with {len(sources)} sources")
+        yield sources
+
+
+@ocean.on_resync(ObjectKind.SECRET_DETECTOR)
+async def on_resync_detectors(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianSecretDetectorConfig, event.resource_config).selector
+
+    async for detectors in gitguardian_client.get_secret_detectors(
+        selector.produce_query_params()
+    ):
+        logger.info(f"Received secret detector batch with {len(detectors)} detectors")
+        yield detectors
+
+
+@ocean.on_resync(ObjectKind.INTERNAL_SECRET_INCIDENT)
+async def on_resync_internal_secret_incidents(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client()
+    selector = cast(
+        GitGuardianInternalSecretIncidentConfig, event.resource_config
+    ).selector
+
+    async for internal_incidents in gitguardian_client.get_internal_secret_incidents(
+        selector.produce_query_params()
+    ):
+        logger.info(
+            f"Received internal secrets incident batch with {len(internal_incidents)} incidents"
+        )
+        yield internal_incidents
+
+
+@ocean.on_resync(ObjectKind.PUBLIC_SECRET_INCIDENT)
+async def on_resync_public_secret_incidents(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client()
+    selector = cast(
+        GitGuardianPublicSecretIncidentConfig, event.resource_config
+    ).selector
+
+    async for public_incidents in gitguardian_client.get_public_secret_incidents(
+        selector.produce_query_params()
+    ):
+        logger.info(
+            f"Received public secrets incident batch with {len(public_incidents)} incidents"
+        )
+        yield public_incidents
+
+
+@ocean.on_resync(ObjectKind.USER)
+async def on_resync_members(kind: str) -> ASYNC_GENERATOR_RESYNC_TYPE:
+    gitguardian_client = await init_gitguardian_client()
+    selector = cast(GitGuardianUserConfig, event.resource_config).selector
+
+    async for members in gitguardian_client.get_users(selector.produce_query_params()):
+        logger.info(f"Received users batch with {len(members)} members")
+        yield members
+
+
+ocean.add_webhook_processor("/webhook", InternalSecretIncidentWebhookProcessor)
+ocean.add_webhook_processor("/webhook", PublicSecretIncidentWebhookProcessor)

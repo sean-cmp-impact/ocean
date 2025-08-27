@@ -1,16 +1,142 @@
 resources:
-  - kind: gitguardian-example-kind
+  - kind: source
     selector:
       query: 'true'
     port:
       entity:
         mappings:
-          identifier: .my_custom_id
-          title: '(.my_component + " @ " + .my_service)'
-          blueprint: '"gitguardianExampleBlueprint"'
+          identifier: .full_name | gsub(" "; "")
+          title: (.type + "-" + .full_name) | gsub(" "; "")
+          blueprint: '"gitguardianSource"'
           properties:
-            status: .my_enum
-            text: .my_custom_text
-            component: .my_component
-            service: .my_service
-            score: .my_special_score
+            sourceType: .type
+            fullName: .full_name
+            url: .url
+            health: .health
+            sourceCriticality: .source_criticality
+            openIncidentsCount: .open_incidents_count
+            openCriticalIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.critical
+            openHighIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.high
+            openMediumIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.medium
+            openLowIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.low
+            openInfoIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.info
+            openUnknownIncidents: >-
+              .secret_incidents_breakdown.open_secret_incidents.severity_breakdown.unknown
+            closedIncidentsCount: .closed_incidents_count
+            closedCriticalIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.critical
+            closedHighIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.high
+            closedMediumIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.medium
+            closedLowIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.low
+            closedInfoIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.info
+            closedUnknownIncidents: >-
+              .secret_incidents_breakdown.closed_secret_incidents.severity_breakdown.unknown
+            lastScanDate: .last_scan.date
+            lastScanStatus: .last_scan.status
+            lastScanFailingReason: .last_scan.failing_reason
+            lastScanCommitScanned: .last_scan.commits_scanned
+            lastScanDuration: .last_scan.duration
+            lastScanBranchesScanned: .last_scan.branches_scanned
+            lastScanProgress: .last_scan.progress
+            visibility: .visibility
+  - kind: secret_detector
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .name
+          title: .display_name
+          blueprint: '"gitguardianSecretDetector"'
+          properties:
+            name: .name
+            displayName: .display_name
+            type: .type
+            category: .category
+            isActive: .is_active
+            scansCodeOnly: .scans_code_only
+            checkable: .checkable
+            useWithValidityCheckDisabled: .use_with_validity_check_disabled
+            frequency: .frequency
+            removedAt: .removed_at
+            openIncidentsCount: .open_incidents_count
+            ignoredIncidentsCount: .ignored_incidents_count
+            resolvedIncidentsCount: .resolved_incidents_count
+  - kind: internal_secret_incident
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: (.id | tostring) + "-" + .detector.name
+          title: .detector.display_name
+          blueprint: '"gitguardianInternalIncident"'
+          properties:
+            date: .date            
+            secretId: .secret_id
+            gitguardianUrl: .gitguardian_url
+            regression: .regression
+            status: .status
+            occurrencesCount: .occurrences_count
+            ignoreReason: .ignore_reason
+            ignoredAt: .ignored_at
+            secretRevoked: .secret_revoked
+            severity: .severity
+            validity: .validity
+            resolvedAt: .resolved_at
+            shareUrl: .share_url
+          relations: {  
+            detector: .detector.name
+          }
+  - kind: public_secret_incident
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: (.id | tostring) + "-" + .detector.name
+          title: .detector.display_name
+          blueprint: '"gitguardianPublicIncident"'
+          properties:
+            date: .date            
+            secretId: .secret_id
+            gitguardianUrl: .gitguardian_url
+            regression: .regression
+            status: .status
+            occurrencesCount: .occurrences_count
+            ignoreReason: .ignore_reason
+            ignoredAt: .ignored_at
+            secretRevoked: .secret_revoked
+            severity: .severity
+            validity: .validity
+            resolvedAt: .resolved_at
+            shareUrl: .share_url
+            declarative_secret_status: .declarative_secret_status
+          relations: {  
+            detector: .detector.name
+          }
+  - kind: user
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id | tostring
+          title: .name
+          blueprint: '"gitguardianUser"'
+          properties:
+            name: .name
+            email: .email
+            accessLevel: .access_level
+            active: .active
+            createdAt: .created_at
+            lastLogin: .last_login
