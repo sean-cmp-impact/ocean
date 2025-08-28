@@ -1,0 +1,113 @@
+createMissingRelatedEntities: true
+deleteDependentEntities: true
+resources:
+  - kind: entity
+    selector:
+      query: "true"
+      entityTypes: ["APPLICATION", "SERVICE"]
+      entityFields: "firstSeenTms,lastSeenTms,tags"
+    port:
+      entity:
+        mappings:
+          identifier: .entityId
+          title: .displayName
+          blueprint: '"dynatraceEntity"'
+          properties:
+            firstSeen: ".firstSeenTms / 1000 | todate"
+            lastSeen: ".lastSeenTms / 1000 | todate"
+            type: .type
+            tags: .tags[].stringRepresentation
+
+  - kind: problem
+    selector:
+      query: "true"
+    port:
+      entity:
+        mappings:
+          identifier: .problemId
+          title: .title
+          blueprint: '"dynatraceProblem"'
+          properties:
+            entityTags: .entityTags[].stringRepresentation
+            evidenceDetails: .evidenceDetails.details[].displayName
+            managementZones: .managementZones[].name
+            problemFilters: .problemFilters[].name
+            severityLevel: .severityLevel
+            status: .status
+            startTime: ".startTime / 1000 | todate"
+            endTime: ".endTime | if . == -1 then null else (./1000 | todate) end"
+          relations:
+            impactedEntities: .impactedEntities[].entityId.id
+            linkedProblemInfo: .linkedProblemInfo.problemId
+            rootCauseEntity: .rootCauseEntity.entityId.id
+
+  - kind: slo
+    selector:
+      query: "true"
+      attachRelatedEntities: true
+    port:
+      entity:
+        mappings:
+          identifier: .id
+          title: .name
+          blueprint: '"dynatraceSlo"'
+          properties:
+            status: .status
+            target: .target
+            enabled: .enabled
+            warning: .warning
+            error: .error
+            errorBudget: .errorBudget
+            evaluatedPercentage: .evaluatedPercentage
+            evaluationType: .evaluationType
+            filter: .filter
+          relations:
+            entities: if .__entities != null then .__entities | map(.entityId) else [] end
+
+  - kind: team
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .value.identifier
+          title: .value.name
+          blueprint: '"dynatraceTeam"'
+          properties:
+            description: .value.descriptions
+            links: '[.value.links[] | .url]'
+            emailContact: .value.contactDetails[] | select(.integrationType == "EMAIL") | .email
+            productivityToolsContact: '[.value.contactDetails[] | select(.integrationType != "EMAIL" and .url != null) | .url]'
+            responsibilities: .value.responsibilities
+            additionalDetails: .value.additionalInformation
+
+  - kind: entity
+    selector:
+      query: 'true'
+      entityTypes:
+        - "cloud:gcp:k8s_cluster"
+        - "cloud:gcp:pubsub_subscription"
+        - "cloud:gcp:pubsub_topic"
+        - "cloud:gcp:gcs_bucket"
+        - "cloud:gcp:gae_app"
+        - "cloud:aws:acmprivateca"
+        - "cloud:aws:api_gateway"
+        - "cloud:aws:app_runner"
+        - "cloud:aws:appstream"
+        - "cloud:aws:appsync"
+        - "cloud:azure:apimanagement:service"
+        - "cloud:azure:app:containerapps"
+        - "cloud:azure:app:managedenvironments"
+        - "cloud:azure:appconfiguration:configurationstores"
+        - "cloud:azure:appplatform:spring"
+    port:
+      entity:
+        mappings:
+          identifier: .displayName | gsub(" "; "-")
+          title: .displayName
+          blueprint: '"dynatraceEntityCloudResource"'
+          properties:
+            firstSeen: .firstSeenTms / 1000 | todate
+            lastSeen: .lastSeenTms / 1000 | todate
+            type: .type
+            tags: .tags[].stringRepresentation

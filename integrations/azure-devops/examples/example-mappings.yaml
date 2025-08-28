@@ -1,0 +1,138 @@
+deleteDependentEntities: true
+createMissingRelatedEntities: true
+resources:
+  - kind: board
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id | gsub(" "; "")
+          title: .name
+          blueprint: '"board"'
+          properties:
+            link: .url
+          relations:
+            project: .__project.id | gsub(" "; "")
+  - kind: column
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .__stateType+"-"+.name+"-"+.__board.__project.id | gsub(" "; "")
+          title: .name
+          blueprint: '"column"'
+          relations:
+            board: .__board.id | gsub(" "; "")
+  - kind: release
+    selector:
+      query: 'true'
+    port:
+      entity:
+        mappings:
+          identifier: .id | tostring | gsub(" "; "")
+          title: .name
+          blueprint: '"release"'
+          properties:
+            status: .status
+            reason: .reason
+            createdDate: .createdOn
+            modifiedDate: .modifiedOn
+            createdBy: .createdBy.displayName
+            modifiedBy: .modifiedBy.displayName
+            tags: .tags
+            link: ._links.web.href | gsub("_release?releaseId="; "")
+          relations:
+            project: .projectReference.id | gsub(" "; "")
+  - kind: file
+    selector:
+      query: 'true'
+      files:
+        path: package.json
+        repos:
+          - my-node-app
+          - my-react-app
+    port:
+      entity:
+        mappings:
+          identifier: .file.path | gsub(" "; "")
+          title: .file.path
+          blueprint: '"file"'
+          properties:
+            path: .file.path
+            size: .file.size
+            content: .file.content
+            link: .repo.remoteUrl + "?path=" + (.file.path)
+          relations:
+            repository: >-
+              "\(.repo.project.name | ascii_downcase | gsub("[ ();]";
+              ""))/\(.repo.name | ascii_downcase | gsub("[ ();]"; ""))"
+  - kind: file
+    selector:
+      query: 'true'
+      files:
+        path:
+          - deployment/helm/values.yaml
+          - docs/README.md
+    port:
+      entity:
+        mappings:
+          identifier: .file.path | gsub(" "; "")
+          title: .file.path
+          blueprint: '"file"'
+          properties:
+            path: .file.path
+            size: .file.size
+            content: .file.content
+            link: .repo.remoteUrl + "?path=" + (.file.path)
+          relations:
+            repository: >-
+              "\(.repo.project.name | ascii_downcase | gsub("[ ();]";
+              ""))/\(.repo.name | ascii_downcase | gsub("[ ();]"; ""))"
+  - kind: file
+    selector:
+      query: 'true'
+      files:
+        path:
+          - package.json
+          - package-lock.json
+    port:
+      entity:
+        mappings:
+          identifier: .file.objectId
+          title: .file.path
+          blueprint: '"file"'
+          properties:
+            path: .file.path
+            size: .file.size
+            content: .file.content
+            link: .repo.remoteUrl + "?path=" + (.file.path)
+          relations:
+            repository: >-
+              "\(.repo.project.name | ascii_downcase | gsub("[ ();]";
+              ""))/\(.repo.name | ascii_downcase | gsub("[ ();]"; ""))"
+  - kind: folder
+    selector:
+      query: 'true'
+      project_name: 'project001'
+      folders:
+        - path: measure/
+          repos:
+            - name: test_repo
+              branch: main
+        - path: fulfyldwms/*
+          repos:
+            - name: folder_test_repo
+              branch: main
+    port:
+      entity:
+        mappings:
+          identifier: .objectId
+          title: .path
+          url: .__repository.url
+          blueprint: '"azureDevopsRepository"'
+          properties:
+            defaultBranch: .__repository.defaultBranch
+          relations:
+            project: .__repository.project.id | gsub(" "; "")
